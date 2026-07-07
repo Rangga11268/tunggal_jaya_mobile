@@ -69,9 +69,14 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
-    - assets/icons/
-    - assets/logo/
+    - assets/logo/logo.png
+    - assets/images/hero.jpg
+    - assets/images/rute.png
+    - assets/images/primadona.webp
+    - assets/images/car-seat.png
+    - assets/images/bentas01.webp
+    - assets/images/bentas02.webp
+    - assets/images/bentas03.webp
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -6,6 +6,7 @@ class ApiEndpoints {
   static const String logout = '$_prefix/auth/logout';
   static const String forgotPassword = '$_prefix/auth/forgot-password';
   static const String resetPassword = '$_prefix/auth/reset-password';
+  static const String sendOtp = '$_prefix/auth/send-otp';
   static const String verifyPhone = '$_prefix/auth/verify-phone';
   static const String resendOtp = '$_prefix/auth/resend-otp';
 

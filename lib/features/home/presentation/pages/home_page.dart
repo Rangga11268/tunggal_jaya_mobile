@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/config/app_theme.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -45,18 +46,25 @@ class HomePage extends ConsumerWidget {
                           Row(
                             children: [
                               Container(
-                                width: 40,
-                                height: 40,
+                                width: 42,
+                                height: 42,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(alpha: 0.3),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
                                   child: Image.asset(
                                     'assets/logo/logo.png',
-                                    width: 40,
-                                    height: 40,
+                                    width: 42,
+                                    height: 42,
                                     fit: BoxFit.contain,
                                     errorBuilder: (_, __, ___) => const Icon(
                                       Icons.directions_bus,
@@ -66,21 +74,23 @@ class HomePage extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 14),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Halo, $userName',
-                                    style: AppTextStyles.body.copyWith(
+                                    style: GoogleFonts.manrope(
                                       color: Colors.white,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                   Text(
                                     'Mau kemana hari ini?',
-                                    style: AppTextStyles.caption.copyWith(
-                                      color: Colors.white70,
+                                    style: GoogleFonts.manrope(
+                                      color: Colors.white54,
+                                      fontSize: 13,
                                     ),
                                   ),
                                 ],
@@ -94,14 +104,20 @@ class HomePage extends ConsumerWidget {
                                 onPressed: () {},
                               ),
                               Positioned(
-                                right: 8,
-                                top: 8,
+                                right: 10,
+                                top: 10,
                                 child: Container(
                                   width: 8,
                                   height: 8,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     color: AppColors.primary,
                                     shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary.withValues(alpha: 0.5),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -117,9 +133,12 @@ class HomePage extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Text(
                         'Perjalanan\nNyaman &',
-                        style: AppTextStyles.heroTitle.copyWith(
+                        style: GoogleFonts.unbounded(
                           fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
                           height: 1.1,
+                          letterSpacing: -1,
                         ),
                       ),
                     ),
@@ -129,102 +148,163 @@ class HomePage extends ConsumerWidget {
                         children: [
                           Text(
                             'Aman',
-                            style: AppTextStyles.heroTitle.copyWith(
+                            style: GoogleFonts.unbounded(
                               fontSize: 32,
+                              fontWeight: FontWeight.w900,
                               color: AppColors.primary,
                               height: 1.1,
+                              letterSpacing: -1,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 14),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: AppColors.accent.withValues(alpha: 0.2),
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.accent.withValues(alpha: 0.2),
+                                  AppColors.accent.withValues(alpha: 0.1),
+                                ],
+                              ),
                               borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: AppColors.accent.withValues(alpha: 0.3),
+                              ),
                             ),
                             child: Text(
                               'PREMIUM',
-                              style: AppTextStyles.caption.copyWith(
+                              style: GoogleFonts.manrope(
                                 color: AppColors.accent,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.5,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 2,
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Text(
                         'Bersama Tunggal Jaya Transport',
-                        style: AppTextStyles.caption.copyWith(
+                        style: GoogleFonts.manrope(
                           color: Colors.white54,
                           fontSize: 14,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
-                    // Search Card
+                    // ===== SEARCH CARD (REDESIGNED) =====
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: const Color(0x19FFFFFF),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0x33FFFFFF)),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.1),
+                              Colors.white.withValues(alpha: 0.05),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
                         ),
                         child: Column(
                           children: [
-                            _SearchField(
-                              icon: Icons.location_on_outlined,
-                              hint: 'Kota Asal',
-                            ),
-                            const SizedBox(height: 8),
-                              Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Icon(
-                                  Icons.swap_vert,
+                            // Label
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.search_rounded,
                                   color: Colors.white.withValues(alpha: 0.5),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'CARI TIKET BUS',
+                                  style: GoogleFonts.manrope(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Origin Field
+                            _GlassField(
+                              icon: Icons.trip_origin_rounded,
+                              hint: 'Kota Asal',
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(height: 4),
+                            // Swap Button
+                            Center(
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(alpha: 0.4),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.swap_vert_rounded,
+                                  color: Colors.white,
                                   size: 20,
                                 ),
                               ),
-                            const SizedBox(height: 8),
-                            _SearchField(
-                              icon: Icons.location_on_outlined,
+                            ),
+                            const SizedBox(height: 4),
+                            // Destination Field
+                            _GlassField(
+                              icon: Icons.location_on_rounded,
                               hint: 'Kota Tujuan',
+                              color: const Color(0xFF8B5CF6),
                             ),
                             const SizedBox(height: 12),
-                            _SearchField(
-                              icon: Icons.calendar_today_outlined,
+                            // Date Field
+                            _GlassField(
+                              icon: Icons.calendar_month_rounded,
                               hint: 'Tanggal Keberangkatan',
+                              color: AppColors.accent,
                             ),
                             const SizedBox(height: 20),
+                            // Search Button
                             SizedBox(
                               width: double.infinity,
-                              height: 54,
-                              child: ElevatedButton(
+                              height: 56,
+                              child: ElevatedButton.icon(
                                 onPressed: () {},
+                                icon: const Icon(Icons.search_rounded, size: 22),
+                                label: Text(
+                                  'Cari Tiket'.toUpperCase(),
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   elevation: 0,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.search, color: Colors.white, size: 20),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Cari Tiket',
-                                      style: AppTextStyles.button,
-                                    ),
-                                  ],
                                 ),
                               ),
                             ),
@@ -240,7 +320,7 @@ class HomePage extends ConsumerWidget {
 
             // ========== SHORTCUT CATEGORIES ==========
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -265,7 +345,7 @@ class HomePage extends ConsumerWidget {
                   _CategoryItem(
                     icon: Icons.newspaper_outlined,
                     label: 'Berita',
-                    color: AppColors.info,
+                    color: const Color(0xFF0EA5E9),
                     onTap: () {},
                   ),
                 ],
@@ -273,76 +353,138 @@ class HomePage extends ConsumerWidget {
             ),
 
             // ========== FEATURED ROUTES ==========
-            const SectionHeader(
-              title: 'Rute Populer',
-              actionLabel: 'Lihat Semua',
+            Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Rute Populer',
+                    style: GoogleFonts.unbounded(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryText,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Text(
+                          'Lihat Semua',
+                          style: GoogleFonts.manrope(
+                            color: AppColors.primary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        Icon(Icons.chevron_right, size: 18, color: AppColors.primary),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             SizedBox(
-              height: 190,
+              height: 200,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   final routes = [
-                    _RouteData('Surabaya', 'Banyuwangi', 'Rp 85.000', '2.5 jam', AppColors.primary),
+                    _RouteData('Surabaya', 'Banyuwangi', 'Rp 85.000', '2,5 jam', AppColors.primary),
                     _RouteData('Banyuwangi', 'Denpasar', 'Rp 120.000', '4 jam', const Color(0xFF8B5CF6)),
-                    _RouteData('Surabaya', 'Denpasar', 'Rp 155.000', '6.5 jam', const Color(0xFF0EA5E9)),
+                    _RouteData('Surabaya', 'Denpasar', 'Rp 155.000', '6,5 jam', const Color(0xFF0EA5E9)),
                   ];
                   final route = routes[index];
                   return Container(
-                    width: 200,
-                    margin: const EdgeInsets.only(right: 12),
-                    padding: const EdgeInsets.all(20),
+                    width: 220,
+                    margin: const EdgeInsets.only(right: 14),
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
                           route.color,
-                          route.color.withValues(alpha: 0.7),
+                          route.color.withValues(alpha: 0.6),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: route.color.withValues(alpha: 0.3),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(Icons.route, color: Colors.white, size: 20),
+                          child: const Icon(Icons.route_rounded, color: Colors.white, size: 22),
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${route.origin} → ${route.destination}',
-                              style: AppTextStyles.body.copyWith(
+                              '${route.origin}',
+                              style: GoogleFonts.manrope(
                                 color: Colors.white,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  Container(height: 1, width: 24, color: Colors.white38),
+                                  const SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white54),
+                                  const SizedBox(width: 8),
+                                  Container(height: 1, width: 24, color: Colors.white38),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              '${route.destination}',
+                              style: GoogleFonts.manrope(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
                             Row(
                               children: [
                                 Text(
                                   route.price,
-                                  style: AppTextStyles.bodyBold.copyWith(
+                                  style: GoogleFonts.unbounded(
                                     color: Colors.white,
                                     fontSize: 18,
+                                    fontWeight: FontWeight.w900,
                                   ),
                                 ),
                                 const Spacer(),
-                                Icon(Icons.schedule, color: Colors.white.withValues(alpha: 0.7), size: 14),
+                                Icon(Icons.schedule_rounded, size: 14, color: Colors.white54),
                                 const SizedBox(width: 4),
                                 Text(
                                   route.duration,
-                                  style: AppTextStyles.caption.copyWith(color: Colors.white70),
+                                  style: GoogleFonts.manrope(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ],
                             ),
@@ -358,9 +500,38 @@ class HomePage extends ConsumerWidget {
             const SizedBox(height: 8),
 
             // ========== NEWS SECTION ==========
-            const SectionHeader(
-              title: 'Berita Terbaru',
-              actionLabel: 'Lihat Semua',
+            Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Berita Terbaru',
+                    style: GoogleFonts.unbounded(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryText,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Text(
+                          'Lihat Semua',
+                          style: GoogleFonts.manrope(
+                            color: AppColors.primary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        Icon(Icons.chevron_right, size: 18, color: AppColors.primary),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -386,38 +557,59 @@ class HomePage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // ========== FLEET PREVIEW ==========
-            const SectionHeader(
-              title: 'Armada Kami',
-              actionLabel: 'Lihat Semua',
+            Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+              child: Text(
+                'Armada Kami',
+                style: GoogleFonts.unbounded(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryText,
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppColors.darkBg,
-                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.darkBg,
+                      const Color(0xFF1A1A1A),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     Container(
                       width: 100,
-                      height: 100,
+                      height: 110,
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                         child: Image.asset(
                           'assets/images/primadona.webp',
                           width: 100,
-                          height: 100,
+                          height: 110,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => const Icon(
-                            Icons.directions_bus,
-                            size: 40,
-                            color: Colors.white54,
+                            Icons.directions_bus_rounded,
+                            size: 42,
+                            color: Colors.white38,
                           ),
                         ),
                       ),
@@ -429,23 +621,32 @@ class HomePage extends ConsumerWidget {
                         children: [
                           Text(
                             'Armada Premium',
-                            style: AppTextStyles.h4.copyWith(color: Colors.white),
+                            style: GoogleFonts.unbounded(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Executive & Business Class',
-                            style: AppTextStyles.caption.copyWith(color: Colors.white54),
+                            style: GoogleFonts.manrope(
+                              color: Colors.white54,
+                              fontSize: 13,
+                            ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 14),
                           Row(
                             children: [
-                              const Icon(Icons.airline_seat_recline_extra, size: 16, color: AppColors.accent),
-                              const SizedBox(width: 4),
-                              Text('Kursi Ergonomis', style: AppTextStyles.caption.copyWith(color: Colors.white70, fontSize: 11)),
+                              _FacilityChip(
+                                icon: Icons.airline_seat_recline_normal_rounded,
+                                label: 'Kursi Ergonomis',
+                              ),
                               const SizedBox(width: 12),
-                              const Icon(Icons.wifi, size: 16, color: AppColors.accent),
-                              const SizedBox(width: 4),
-                              Text('WiFi', style: AppTextStyles.caption.copyWith(color: Colors.white70, fontSize: 11)),
+                              _FacilityChip(
+                                icon: Icons.wifi_rounded,
+                                label: 'WiFi Gratis',
+                              ),
                             ],
                           ),
                         ],
@@ -462,36 +663,52 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-class _SearchField extends StatelessWidget {
+// ===== NEW GLASS FIELD COMPONENT =====
+class _GlassField extends StatelessWidget {
   final IconData icon;
   final String hint;
+  final Color color;
 
-  const _SearchField({required this.icon, required this.hint});
+  const _GlassField({
+    required this.icon,
+    required this.hint,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.white.withValues(alpha: 0.5)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              readOnly: true,
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 14),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              style: TextStyle(color: Colors.white, fontSize: 14),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(10),
             ),
+            child: Icon(icon, size: 18, color: color),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            hint,
+            style: GoogleFonts.manrope(
+              color: Colors.white.withValues(alpha: 0.4),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const Spacer(),
+          Icon(
+            Icons.keyboard_arrow_down_rounded,
+            size: 18,
+            color: Colors.white.withValues(alpha: 0.3),
           ),
         ],
       ),
@@ -520,16 +737,23 @@ class _CategoryItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 26),
           ),
           const SizedBox(height: 8),
-          Text(label, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryText,
+            ),
+          ),
         ],
       ),
     );
@@ -594,23 +818,36 @@ class _NewsCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.bodyMedium.copyWith(fontSize: 14),
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryText,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     excerpt,
-                    style: AppTextStyles.caption.copyWith(fontSize: 11),
+                    style: GoogleFonts.manrope(
+                      fontSize: 11,
+                      color: AppColors.secondaryText,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 12, color: AppColors.disabled),
+                      Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.disabled),
                       const SizedBox(width: 4),
-                      Text(date, style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                      Text(
+                        date,
+                        style: GoogleFonts.manrope(
+                          fontSize: 11,
+                          color: AppColors.disabled,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -619,6 +856,32 @@ class _NewsCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _FacilityChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _FacilityChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: AppColors.accent),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            color: Colors.white70,
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

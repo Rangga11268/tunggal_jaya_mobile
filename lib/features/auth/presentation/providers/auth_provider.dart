@@ -9,12 +9,16 @@ class AuthState {
   final bool isLoading;
   final String? error;
   final Map<String, dynamic>? user;
+  final bool needsVerification;
+  final bool otpSent;
 
   const AuthState({
     this.isAuthenticated = false,
     this.isLoading = false,
     this.error,
     this.user,
+    this.needsVerification = false,
+    this.otpSent = false,
   });
 
   AuthState copyWith({
@@ -22,12 +26,16 @@ class AuthState {
     bool? isLoading,
     String? error,
     Map<String, dynamic>? user,
+    bool? needsVerification,
+    bool? otpSent,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isLoading: isLoading ?? this.isLoading,
       error: error,
       user: user ?? this.user,
+      needsVerification: needsVerification ?? this.needsVerification,
+      otpSent: otpSent ?? this.otpSent,
     );
   }
 }
@@ -89,13 +97,53 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _secureStorage.saveToken(token);
       await _secureStorage.saveUserData(user);
 
-      state = AuthState(isAuthenticated: true, user: user);
+      state = AuthState(
+        isAuthenticated: true,
+        needsVerification: true,
+        user: user,
+      );
     } on ApiException catch (e) {
       state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: 'Terjadi kesalahan, silakan coba lagi',
+      );
+    }
+  }
+
+  Future<void> sendOtp() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _apiClient.post(ApiEndpoints.sendOtp);
+      state = state.copyWith(isLoading: false, otpSent: true);
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Gagal mengirim OTP',
+      );
+    }
+  }
+
+  Future<void> verifyOtp(String otp) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _apiClient.post(ApiEndpoints.verifyPhone, data: {'otp': otp});
+
+      final updatedUser = Map<String, dynamic>.from(state.user ?? {})
+        ..['phone_verified_at'] = DateTime.now().toIso8601String();
+
+      await _secureStorage.saveUserData(updatedUser);
+
+      state = AuthState(isAuthenticated: true, user: updatedUser);
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Kode OTP tidak valid',
       );
     }
   }
