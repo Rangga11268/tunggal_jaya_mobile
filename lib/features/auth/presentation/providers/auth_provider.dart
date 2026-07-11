@@ -114,10 +114,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> sendOtp() async {
+  Future<void> sendOtp({String? identifier, String method = 'whatsapp'}) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await _apiClient.post(ApiEndpoints.sendOtp);
+      final id = identifier ?? state.user?['phone'] ?? state.user?['email'];
+      if (id == null) throw const ApiException(message: 'Phone or email not found');
+
+      await _apiClient.post(ApiEndpoints.sendOtp, data: {
+        'identifier': id,
+        'method': method,
+      });
       state = state.copyWith(isLoading: false, otpSent: true);
     } on NetworkException catch (_) {
       state = state.copyWith(isLoading: false, otpSent: true);
@@ -130,10 +136,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> verifyOtp(String otp) async {
+  Future<void> verifyOtp(String otp, {String? identifier}) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await _apiClient.post(ApiEndpoints.verifyPhone, data: {'otp': otp});
+      final id = identifier ?? state.user?['phone'] ?? state.user?['email'];
+      if (id == null) throw const ApiException(message: 'Phone or email not found');
+
+      await _apiClient.post(ApiEndpoints.verifyOtp, data: {
+        'identifier': id,
+        'otp': otp,
+      });
 
       final updatedUser = Map<String, dynamic>.from(state.user ?? {})
         ..['phone_verified_at'] = DateTime.now().toIso8601String();
