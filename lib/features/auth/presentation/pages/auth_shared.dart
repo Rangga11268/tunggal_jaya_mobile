@@ -15,11 +15,11 @@ class AuthPalette {
   static const Color muted = Color(0xFF94A3B8);
 }
 
-TextStyle authTitleStyle({double size = 30, FontWeight weight = FontWeight.w700}) {
+TextStyle authTitleStyle({double size = 30, FontWeight weight = FontWeight.w700, Color? color}) {
   return GoogleFonts.plusJakartaSans(
     fontSize: size,
     fontWeight: weight,
-    color: AuthPalette.textPrimary,
+    color: color ?? AuthPalette.textPrimary,
     height: 1.08,
     letterSpacing: -0.5,
   );

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/config/app_theme.dart';
-import '../../../../core/widgets/section_header.dart';
+
+import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/config/app_theme.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -13,648 +13,228 @@ class HomePage extends ConsumerWidget {
     final authState = ref.watch(authProvider);
     final userName = authState.user?['name'] as String? ?? 'Penumpang';
 
-    return Scaffold(
-      body: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Header(userName: userName),
+          const SizedBox(height: 20),
+          const _SearchCard(),
+          const SizedBox(height: 24),
+          const _SectionHeader(
+            title: 'Rute Populer',
+            onSeeAll: null,
+          ),
+          const SizedBox(height: 14),
+          const _RouteList(),
+          const SizedBox(height: 24),
+          const _SectionHeader(
+            title: 'Berita Terbaru',
+            onSeeAll: null,
+          ),
+          const SizedBox(height: 14),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                _NewsCard(
+                  image: 'assets/images/bentas01.webp',
+                  title: 'Info Jadwal Perjalanan Terbaru & Terupdate',
+                  excerpt: 'Dapatkan informasi lengkap mengenai jadwal keberangkatan terbaru armada Tunggal Jaya Transport.',
+                  date: '05 Mar 2026',
+                ),
+                SizedBox(height: 12),
+                _NewsCard(
+                  image: 'assets/images/bentas02.webp',
+                  title: 'Jelajahi Rute & Armada Kelas Premium',
+                  excerpt: 'Nikmati kenyamanan perjalanan dengan armada premium kami.',
+                  date: '05 Mar 2026',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          const _SectionHeader(
+            title: 'Armada Kami',
+            onSeeAll: null,
+          ),
+          const SizedBox(height: 14),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 32),
+            child: _FleetCard(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  final String userName;
+
+  const _Header({required this.userName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: AuthPalette.border)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AuthPalette.border),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/logo/logo.png',
+                        width: 42,
+                        height: 42,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.directions_bus_rounded,
+                          size: 22,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Halo, $userName',
+                        style: authBodyStyle(
+                          size: 15,
+                          weight: FontWeight.w700,
+                          color: AuthPalette.textPrimary,
+                        ),
+                      ),
+                      Text(
+                        'Mau kemana hari ini?',
+                        style: authBodyStyle(size: 13),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined,
+                        color: AuthPalette.textSecondary),
+                    onPressed: () {},
+                  ),
+                  Positioned(
+                    right: 12,
+                    top: 10,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Cari Tiket Bus',
+            style: authTitleStyle(size: 24),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Temukan jadwal perjalanan Anda',
+            style: authBodyStyle(),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+class _SearchCard extends StatelessWidget {
+  const _SearchCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: AuthCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ========== HERO SECTION ==========
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF0B0B0B),
-                    Color(0xFF1A1A1A),
-                    Color(0xFF0B0B0B),
-                  ],
+            Row(
+              children: [
+                Icon(Icons.search_rounded,
+                    size: 16, color: AuthPalette.muted),
+                const SizedBox(width: 8),
+                Text(
+                  'CARI JADWAL',
+                  style: authBodyStyle(
+                    size: 11,
+                    weight: FontWeight.w700,
+                    color: AuthPalette.muted,
+                  ),
                 ),
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // App Bar
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 42,
-                                height: 42,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(alpha: 0.3),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.asset(
-                                    'assets/logo/logo.png',
-                                    width: 42,
-                                    height: 42,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) => const Icon(
-                                      Icons.directions_bus,
-                                      size: 22,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Halo, $userName',
-                                    style: GoogleFonts.manrope(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Mau kemana hari ini?',
-                                    style: GoogleFonts.manrope(
-                                      color: Colors.white54,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Stack(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-                                onPressed: () {},
-                              ),
-                              Positioned(
-                                right: 10,
-                                top: 10,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primary.withValues(alpha: 0.5),
-                                        blurRadius: 4,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Hero Text
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        'Perjalanan\nNyaman &',
-                        style: GoogleFonts.unbounded(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          height: 1.1,
-                          letterSpacing: -1,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Aman',
-                            style: GoogleFonts.unbounded(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.primary,
-                              height: 1.1,
-                              letterSpacing: -1,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.accent.withValues(alpha: 0.2),
-                                  AppColors.accent.withValues(alpha: 0.1),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppColors.accent.withValues(alpha: 0.3),
-                              ),
-                            ),
-                            child: Text(
-                              'PREMIUM',
-                              style: GoogleFonts.manrope(
-                                color: AppColors.accent,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        'Bersama Tunggal Jaya Transport',
-                        style: GoogleFonts.manrope(
-                          color: Colors.white54,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-
-                    // ===== SEARCH CARD (REDESIGNED) =====
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Colors.white.withValues(alpha: 0.1),
-                              Colors.white.withValues(alpha: 0.05),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.12),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            // Label
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.search_rounded,
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'CARI TIKET BUS',
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.white.withValues(alpha: 0.5),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 2,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Origin Field
-                            _GlassField(
-                              icon: Icons.trip_origin_rounded,
-                              hint: 'Kota Asal',
-                              color: AppColors.primary,
-                            ),
-                            const SizedBox(height: 4),
-                            // Swap Button
-                            Center(
-                              child: Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(alpha: 0.4),
-                                      blurRadius: 8,
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.swap_vert_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            // Destination Field
-                            _GlassField(
-                              icon: Icons.location_on_rounded,
-                              hint: 'Kota Tujuan',
-                              color: const Color(0xFF8B5CF6),
-                            ),
-                            const SizedBox(height: 12),
-                            // Date Field
-                            _GlassField(
-                              icon: Icons.calendar_month_rounded,
-                              hint: 'Tanggal Keberangkatan',
-                              color: AppColors.accent,
-                            ),
-                            const SizedBox(height: 20),
-                            // Search Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton.icon(
-                                onPressed: () {},
-                                icon: const Icon(Icons.search_rounded, size: 22),
-                                label: Text(
-                                  'Cari Tiket'.toUpperCase(),
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  elevation: 0,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
+              ],
             ),
-
-            // ========== SHORTCUT CATEGORIES ==========
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _CategoryItem(
-                    icon: Icons.route_outlined,
-                    label: 'Rute',
-                    color: AppColors.primary,
-                    onTap: () {},
-                  ),
-                  _CategoryItem(
-                    icon: Icons.bus_alert_outlined,
-                    label: 'Armada',
-                    color: const Color(0xFF8B5CF6),
-                    onTap: () {},
-                  ),
-                  _CategoryItem(
-                    icon: Icons.percent_outlined,
-                    label: 'Promo',
-                    color: AppColors.accent,
-                    onTap: () {},
-                  ),
-                  _CategoryItem(
-                    icon: Icons.newspaper_outlined,
-                    label: 'Berita',
-                    color: const Color(0xFF0EA5E9),
-                    onTap: () {},
-                  ),
-                ],
-              ),
+            const SizedBox(height: 16),
+            _SearchField(
+              icon: Icons.trip_origin_rounded,
+              hint: 'Kota Asal',
             ),
-
-            // ========== FEATURED ROUTES ==========
-            Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Rute Populer',
-                    style: GoogleFonts.unbounded(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      children: [
-                        Text(
-                          'Lihat Semua',
-                          style: GoogleFonts.manrope(
-                            color: AppColors.primary,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        Icon(Icons.chevron_right, size: 18, color: AppColors.primary),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  final routes = [
-                    _RouteData('Surabaya', 'Banyuwangi', 'Rp 85.000', '2,5 jam', AppColors.primary),
-                    _RouteData('Banyuwangi', 'Denpasar', 'Rp 120.000', '4 jam', const Color(0xFF8B5CF6)),
-                    _RouteData('Surabaya', 'Denpasar', 'Rp 155.000', '6,5 jam', const Color(0xFF0EA5E9)),
-                  ];
-                  final route = routes[index];
-                  return Container(
-                    width: 220,
-                    margin: const EdgeInsets.only(right: 14),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          route.color,
-                          route.color.withValues(alpha: 0.6),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: route.color.withValues(alpha: 0.3),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Icon(Icons.route_rounded, color: Colors.white, size: 22),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${route.origin}',
-                              style: GoogleFonts.manrope(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Row(
-                                children: [
-                                  Container(height: 1, width: 24, color: Colors.white38),
-                                  const SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white54),
-                                  const SizedBox(width: 8),
-                                  Container(height: 1, width: 24, color: Colors.white38),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              '${route.destination}',
-                              style: GoogleFonts.manrope(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Text(
-                                  route.price,
-                                  style: GoogleFonts.unbounded(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Icon(Icons.schedule_rounded, size: 14, color: Colors.white54),
-                                const SizedBox(width: 4),
-                                Text(
-                                  route.duration,
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // ========== NEWS SECTION ==========
-            Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Berita Terbaru',
-                    style: GoogleFonts.unbounded(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      children: [
-                        Text(
-                          'Lihat Semua',
-                          style: GoogleFonts.manrope(
-                            color: AppColors.primary,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        Icon(Icons.chevron_right, size: 18, color: AppColors.primary),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  _NewsCard(
-                    image: 'assets/images/bentas01.webp',
-                    title: 'Info Jadwal Perjalanan Terbaru & Terupdate',
-                    excerpt: 'Dapatkan informasi lengkap mengenai jadwal keberangkatan terbaru armada Tunggal Jaya Transport.',
-                    date: '05 Mar 2026',
-                  ),
-                  const SizedBox(height: 12),
-                  _NewsCard(
-                    image: 'assets/images/bentas02.webp',
-                    title: 'Jelajahi Rute & Armada Kelas Premium',
-                    excerpt: 'Nikmati kenyamanan perjalanan dengan armada premium kami.',
-                    date: '05 Mar 2026',
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // ========== FLEET PREVIEW ==========
-            Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
-              child: Text(
-                'Armada Kami',
-                style: GoogleFonts.unbounded(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryText,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+            const SizedBox(height: 4),
+            Center(
               child: Container(
-                padding: const EdgeInsets.all(24),
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.darkBg,
-                      const Color(0xFF1A1A1A),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 100,
-                      height: 110,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        child: Image.asset(
-                          'assets/images/primadona.webp',
-                          width: 100,
-                          height: 110,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
-                            Icons.directions_bus_rounded,
-                            size: 42,
-                            color: Colors.white38,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Armada Premium',
-                            style: GoogleFonts.unbounded(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Executive & Business Class',
-                            style: GoogleFonts.manrope(
-                              color: Colors.white54,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Row(
-                            children: [
-                              _FacilityChip(
-                                icon: Icons.airline_seat_recline_normal_rounded,
-                                label: 'Kursi Ergonomis',
-                              ),
-                              const SizedBox(width: 12),
-                              _FacilityChip(
-                                icon: Icons.wifi_rounded,
-                                label: 'WiFi Gratis',
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                child: const Icon(
+                  Icons.swap_vert_rounded,
+                  color: AppColors.primary,
+                  size: 18,
                 ),
               ),
+            ),
+            const SizedBox(height: 4),
+            _SearchField(
+              icon: Icons.location_on_rounded,
+              hint: 'Kota Tujuan',
+            ),
+            const SizedBox(height: 12),
+            _SearchField(
+              icon: Icons.calendar_month_rounded,
+              hint: 'Tanggal Keberangkatan',
+            ),
+            const SizedBox(height: 18),
+            AuthPrimaryButton(
+              label: 'Cari Tiket',
+              onPressed: () {},
             ),
           ],
         ),
@@ -663,98 +243,171 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-// ===== NEW GLASS FIELD COMPONENT =====
-class _GlassField extends StatelessWidget {
+class _SearchField extends StatelessWidget {
   final IconData icon;
   final String hint;
-  final Color color;
 
-  const _GlassField({
-    required this.icon,
-    required this.hint,
-    required this.color,
-  });
+  const _SearchField({required this.icon, required this.hint});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        color: AuthPalette.background,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AuthPalette.border),
       ),
       child: Row(
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 18, color: color),
-          ),
+          Icon(icon, size: 18, color: AuthPalette.muted),
           const SizedBox(width: 12),
-          Text(
-            hint,
-            style: GoogleFonts.manrope(
-              color: Colors.white.withValues(alpha: 0.4),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              hint,
+              style: authBodyStyle(
+                size: 14,
+                color: AuthPalette.muted,
+              ),
             ),
           ),
-          const Spacer(),
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 18,
-            color: Colors.white.withValues(alpha: 0.3),
-          ),
+          Icon(Icons.keyboard_arrow_down_rounded,
+              size: 18, color: AuthPalette.muted),
         ],
       ),
     );
   }
 }
 
-class _CategoryItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback? onSeeAll;
 
-  const _CategoryItem({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+  const _SectionHeader({required this.title, this.onSeeAll});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(18),
+          Text(title, style: authTitleStyle(size: 18)),
+          if (onSeeAll != null)
+            GestureDetector(
+              onTap: onSeeAll,
+              child: Row(
+                children: [
+                  Text(
+                    'Lihat Semua',
+                    style: authBodyStyle(
+                      size: 13,
+                      weight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  const Icon(Icons.chevron_right,
+                      size: 16, color: AppColors.primary),
+                ],
+              ),
             ),
-            child: Icon(icon, color: color, size: 26),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: GoogleFonts.manrope(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primaryText,
-            ),
-          ),
         ],
+      ),
+    );
+  }
+}
+
+class _RouteList extends StatelessWidget {
+  const _RouteList();
+
+  @override
+  Widget build(BuildContext context) {
+    final routes = [
+      _RouteData('Surabaya', 'Banyuwangi', 'Rp 85.000', '2,5 jam'),
+      _RouteData('Banyuwangi', 'Denpasar', 'Rp 120.000', '4 jam'),
+      _RouteData('Surabaya', 'Denpasar', 'Rp 155.000', '6,5 jam'),
+    ];
+
+    return SizedBox(
+      height: 160,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: routes.length,
+        itemBuilder: (context, index) {
+          final route = routes[index];
+          return Container(
+            width: 200,
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AuthPalette.border),
+              boxShadow: AppShadows.card,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.route_rounded,
+                      color: AppColors.primary, size: 18),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(route.origin,
+                        style: authBodyStyle(
+                            size: 15,
+                            weight: FontWeight.w700,
+                            color: AuthPalette.textPrimary)),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(Icons.arrow_forward_rounded,
+                            size: 12, color: AuthPalette.muted),
+                        const SizedBox(width: 4),
+                        Text(route.destination,
+                            style: authBodyStyle(
+                                size: 15,
+                                weight: FontWeight.w700,
+                                color: AuthPalette.textPrimary)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(route.price,
+                            style: authBodyStyle(
+                                size: 16,
+                                weight: FontWeight.w700,
+                                color: AppColors.primary)),
+                        Row(
+                          children: [
+                            const Icon(Icons.schedule_rounded,
+                                size: 12, color: AuthPalette.muted),
+                            const SizedBox(width: 2),
+                            Text(route.duration,
+                                style: authBodyStyle(
+                                    size: 11, color: AuthPalette.muted)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -765,9 +418,7 @@ class _RouteData {
   final String destination;
   final String price;
   final String duration;
-  final Color color;
-
-  _RouteData(this.origin, this.destination, this.price, this.duration, this.color);
+  _RouteData(this.origin, this.destination, this.price, this.duration);
 }
 
 class _NewsCard extends StatelessWidget {
@@ -788,70 +439,124 @@ class _NewsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AuthPalette.border),
       ),
       clipBehavior: Clip.antiAlias,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.horizontal(left: Radius.circular(24)),
+            borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(20)),
             child: Image.asset(
               image,
-              width: 120,
-              height: 120,
+              width: 100,
+              height: 100,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Container(
-                width: 120,
-                height: 120,
-                color: AppColors.roseLight,
-                child: const Icon(Icons.image_outlined, color: AppColors.disabled),
+                width: 100,
+                height: 100,
+                color: AuthPalette.background,
+                child: const Icon(Icons.image_outlined,
+                    color: AuthPalette.muted),
               ),
             ),
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText,
-                    ),
+                    style: authBodyStyle(
+                        size: 13,
+                        weight: FontWeight.w600,
+                        color: AuthPalette.textPrimary),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     excerpt,
-                    style: GoogleFonts.manrope(
-                      fontSize: 11,
-                      color: AppColors.secondaryText,
-                    ),
+                    style: authBodyStyle(size: 11),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.disabled),
+                      const Icon(Icons.calendar_today_rounded,
+                          size: 11, color: AuthPalette.muted),
                       const SizedBox(width: 4),
                       Text(
                         date,
-                        style: GoogleFonts.manrope(
-                          fontSize: 11,
-                          color: AppColors.disabled,
-                        ),
+                        style: authBodyStyle(
+                            size: 11, color: AuthPalette.muted),
                       ),
                     ],
                   ),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FleetCard extends StatelessWidget {
+  const _FleetCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return AuthCard(
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              'assets/images/primadona.webp',
+              width: 90,
+              height: 100,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                width: 90,
+                height: 100,
+                color: AuthPalette.background,
+                child: const Icon(Icons.directions_bus_rounded,
+                    size: 36, color: AuthPalette.muted),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Armada Premium',
+                    style: authBodyStyle(
+                        size: 16,
+                        weight: FontWeight.w700,
+                        color: AuthPalette.textPrimary)),
+                const SizedBox(height: 2),
+                Text('Executive & Business Class',
+                    style: authBodyStyle(size: 12)),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    _FacilityChip(
+                        icon: Icons.airline_seat_recline_normal_rounded,
+                        label: 'Kursi Ergonomis'),
+                    const SizedBox(width: 10),
+                    _FacilityChip(
+                        icon: Icons.wifi_rounded, label: 'WiFi Gratis'),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -871,16 +576,11 @@ class _FacilityChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: AppColors.accent),
+        Icon(icon, size: 12, color: AppColors.primary),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: GoogleFonts.manrope(
-            color: Colors.white70,
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        Text(label,
+            style: authBodyStyle(
+                size: 10, color: AuthPalette.textSecondary)),
       ],
     );
   }

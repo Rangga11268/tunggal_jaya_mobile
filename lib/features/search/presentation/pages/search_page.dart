@@ -1,106 +1,81 @@
 import 'package:flutter/material.dart';
+import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../../core/config/app_theme.dart';
-import '../../../../core/widgets/empty_state_widget.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF0B0B0B),
-                      Color(0xFF1A1A1A),
-                    ],
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Cari Jadwal',
-                      style: AppTextStyles.heroTitle.copyWith(fontSize: 28),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Temukan tiket bus sesuai kebutuhan Anda',
-                      style: AppTextStyles.caption.copyWith(color: Colors.white54, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Search Form
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    // Origin - Destination
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: AppColors.border),
-                        boxShadow: AppShadows.card,
-                      ),
-                      child: Column(
-                        children: [
-                          const _SearchInput(
-                            icon: Icons.location_on_outlined,
-                            hint: 'Kota Asal',
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Icon(Icons.swap_vert, color: AppColors.primary, size: 20),
-                          ),
-                          const _SearchInput(
-                            icon: Icons.location_on_outlined,
-                            hint: 'Kota Tujuan',
-                          ),
-                          const SizedBox(height: 12),
-                          const _SearchInput(
-                            icon: Icons.calendar_today_outlined,
-                            hint: 'Tanggal Keberangkatan',
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 54,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.search, size: 20),
-                                  const SizedBox(width: 8),
-                                  Text('Cari Tiket'.toUpperCase()),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _PageHeader(
+            title: 'Cari Jadwal',
+            subtitle: 'Temukan tiket bus sesuai kebutuhan Anda',
           ),
-        ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: AuthCard(
+              child: Column(
+                children: [
+                  _SearchInput(
+                    icon: Icons.trip_origin_rounded,
+                    hint: 'Kota Asal',
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Icon(Icons.swap_vert_rounded,
+                        color: AppColors.primary, size: 20),
+                  ),
+                  _SearchInput(
+                    icon: Icons.location_on_rounded,
+                    hint: 'Kota Tujuan',
+                  ),
+                  const SizedBox(height: 12),
+                  _SearchInput(
+                    icon: Icons.calendar_month_rounded,
+                    hint: 'Tanggal Keberangkatan',
+                  ),
+                  const SizedBox(height: 18),
+                  AuthPrimaryButton(
+                    label: 'Cari Tiket',
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PageHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _PageHeader({required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: AuthPalette.border)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: authTitleStyle(size: 24)),
+          const SizedBox(height: 4),
+          Text(subtitle, style: authBodyStyle()),
+        ],
       ),
     );
   }
@@ -115,28 +90,31 @@ class _SearchInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.roseLight,
+        color: AuthPalette.background,
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AuthPalette.border),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColors.disabled),
+          Icon(icon, size: 18, color: AuthPalette.muted),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
               readOnly: true,
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: TextStyle(color: AppColors.disabled, fontSize: 14),
+                hintStyle: authBodyStyle(
+                    size: 14, color: AuthPalette.muted),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              style: const TextStyle(fontSize: 14),
             ),
           ),
+          Icon(Icons.keyboard_arrow_down_rounded,
+              size: 18, color: AuthPalette.muted),
         ],
       ),
     );
