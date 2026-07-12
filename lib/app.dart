@@ -23,13 +23,21 @@ import 'features/profile/presentation/pages/profile_page.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-GoRouter createRouter(WidgetRef ref) {
-  final authState = ref.watch(authProvider);
+class _AuthRefreshNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
+
+final _authRefreshNotifier = _AuthRefreshNotifier();
+
+final routerProvider = Provider<GoRouter>((ref) {
+  ref.listen(authProvider, (_, __) => _authRefreshNotifier.notify());
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/get-started',
+    refreshListenable: _authRefreshNotifier,
     redirect: (context, state) {
+      final authState = ref.read(authProvider);
       final isLoggedIn = authState.isAuthenticated;
       final isAuthRoute =
           state.matchedLocation == '/get-started' ||
@@ -137,8 +145,8 @@ GoRouter createRouter(WidgetRef ref) {
       ),
     ],
   );
-}
-
+});
+ 
 class MainShell extends StatelessWidget {
   final Widget child;
   final String currentLocation;
