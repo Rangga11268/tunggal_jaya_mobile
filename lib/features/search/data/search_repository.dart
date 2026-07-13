@@ -10,6 +10,10 @@ class SearchRepository {
     return await _apiClient.get('/routes/origins-destinations');
   }
 
+  Future<Map<String, dynamic>> getSchedule(String id) async {
+    return await _apiClient.get('/schedules/$id');
+  }
+
   Future<Map<String, dynamic>> getSchedules({
     required String origin,
     required String destination,
