@@ -19,7 +19,8 @@ import 'features/routes/presentation/pages/routes_page.dart';
 import 'features/booking/presentation/pages/booking_history_page.dart';
 import 'features/news/presentation/pages/news_list_page.dart';
 import 'features/profile/presentation/pages/profile_page.dart';
-
+import 'features/search/presentation/pages/schedule_list_page.dart';
+import 'features/booking/presentation/pages/seat_selection_page.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -90,6 +91,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/profile',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ProfilePage()),
+          ),
+          GoRoute(
+            path: '/schedule-list',
+            builder: (context, state) {
+              return ScheduleListPage(
+                origin: state.uri.queryParameters['origin'] ?? '',
+                destination: state.uri.queryParameters['destination'] ?? '',
+                date: state.uri.queryParameters['date'] ?? '',
+              );
+            },
+          ),
+          GoRoute(
+            path: '/seat-selection/:id',
+            builder: (context, state) {
+              return SeatSelectionPage(
+                scheduleId: state.pathParameters['id'] ?? '',
+              );
+            },
           ),
         ],
       ),

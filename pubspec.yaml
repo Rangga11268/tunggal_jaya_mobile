@@ -47,6 +47,8 @@ dependencies:
   lucide_icons_flutter: ^1.2.10
   connectivity_plus: ^6.1.2
   google_fonts: ^8.1.0
+  midtrans_sdk: ^1.2.0
+  pusher_channels_flutter: ^2.4.0
 
 dev_dependencies:
   flutter_test:
