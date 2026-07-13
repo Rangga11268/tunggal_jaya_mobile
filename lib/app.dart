@@ -21,6 +21,7 @@ import 'features/news/presentation/pages/news_list_page.dart';
 import 'features/profile/presentation/pages/profile_page.dart';
 import 'features/search/presentation/pages/schedule_list_page.dart';
 import 'features/booking/presentation/pages/seat_selection_page.dart';
+import 'features/booking/presentation/pages/booking_checkout_page.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -107,6 +108,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               return SeatSelectionPage(
                 scheduleId: state.pathParameters['id'] ?? '',
+              );
+            },
+          ),
+          GoRoute(
+            path: '/checkout/:id',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              final selectedSeats = (extra?['selectedSeats'] as List<String>?) ?? [];
+              return BookingCheckoutPage(
+                scheduleId: state.pathParameters['id'] ?? '',
+                selectedSeats: selectedSeats,
               );
             },
           ),
