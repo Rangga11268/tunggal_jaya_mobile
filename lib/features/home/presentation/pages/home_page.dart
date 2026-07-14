@@ -89,51 +89,53 @@ class _Header extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.2),
-                          width: 1.5),
-                    ),
-                    child: Center(
-                      child: Text(
-                        (userName).substring(0, 1).toUpperCase(),
-                        style: authBodyStyle(
-                          size: 18,
-                          weight: FontWeight.w700,
-                          color: AppColors.primary,
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                            width: 1.5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          userName.isNotEmpty ? userName.substring(0, 1).toUpperCase() : 'P',
+                          style: authBodyStyle(
+                            size: 18,
+                            weight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Halo, $userName',
-                          style: authBodyStyle(
-                            size: 15,
-                            weight: FontWeight.w700,
-                            color: AuthPalette.textPrimary,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Halo, $userName',
+                            style: authBodyStyle(
+                              size: 15,
+                              weight: FontWeight.w700,
+                              color: AuthPalette.textPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          'Mau kemana hari ini?',
-                          style: authBodyStyle(size: 13),
-                        ),
-                      ],
+                          Text(
+                            'Mau kemana hari ini?',
+                            style: authBodyStyle(size: 13),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Stack(
                 children: [
