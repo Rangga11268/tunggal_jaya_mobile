@@ -75,14 +75,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _secureStorage.saveUserData(user);
 
       state = AuthState(isAuthenticated: true, user: user);
-    } on NetworkException catch (_) {
-      await _useDemoSession(email: email);
-    } on TimeoutException catch (_) {
-      await _useDemoSession(email: email);
     } on ApiException catch (e) {
       state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
-      await _useDemoSession(email: email);
+      state = state.copyWith(isLoading: false, error: 'Terjadi kesalahan sistem');
     }
   }
 
@@ -103,14 +99,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         needsVerification: true,
         user: user,
       );
-    } on NetworkException catch (_) {
-      await _useDemoSession(email: data['email'] as String?, needsVerification: true);
-    } on TimeoutException catch (_) {
-      await _useDemoSession(email: data['email'] as String?, needsVerification: true);
     } on ApiException catch (e) {
       state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
-      await _useDemoSession(email: data['email'] as String?, needsVerification: true);
+      state = state.copyWith(isLoading: false, error: 'Terjadi kesalahan sistem');
     }
   }
 
@@ -125,14 +117,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'method': method,
       });
       state = state.copyWith(isLoading: false, otpSent: true);
-    } on NetworkException catch (_) {
-      state = state.copyWith(isLoading: false, otpSent: true);
-    } on TimeoutException catch (_) {
-      state = state.copyWith(isLoading: false, otpSent: true);
     } on ApiException catch (e) {
       state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
-      state = state.copyWith(isLoading: false, otpSent: true);
+      state = state.copyWith(isLoading: false, error: 'Terjadi kesalahan saat mengirim OTP');
     }
   }
 
@@ -153,41 +141,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _secureStorage.saveUserData(updatedUser);
 
       state = AuthState(isAuthenticated: true, user: updatedUser);
-    } on NetworkException catch (_) {
-      await _completeDemoVerification();
-    } on TimeoutException catch (_) {
-      await _completeDemoVerification();
     } on ApiException catch (e) {
       state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
-      await _completeDemoVerification();
+      state = state.copyWith(isLoading: false, error: 'Terjadi kesalahan sistem');
     }
   }
 
-  Future<void> _useDemoSession({String? email, bool needsVerification = false}) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final demoUser = {
-      'id': 1,
-      'name': 'Demo User',
-      'email': email ?? 'demo@email.com',
-      'phone': '08123456789',
-    };
-    await _secureStorage.saveToken('demo_token');
-    await _secureStorage.saveUserData(demoUser);
-    state = AuthState(
-      isAuthenticated: true,
-      needsVerification: needsVerification,
-      user: demoUser,
-    );
-  }
-
-  Future<void> _completeDemoVerification() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final updatedUser = Map<String, dynamic>.from(state.user ?? {})
-      ..['phone_verified_at'] = DateTime.now().toIso8601String();
-    await _secureStorage.saveUserData(updatedUser);
-    state = AuthState(isAuthenticated: true, user: updatedUser);
-  }
 
   Future<void> logout() async {
     try {
