@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/config/app_theme.dart';
 import '../../../../core/network/api_client.dart';
+import '../../auth/presentation/pages/auth_shared.dart';
 import 'package:midtrans_sdk/midtrans_sdk.dart';
 
 class BookingCheckoutPage extends ConsumerStatefulWidget {
@@ -19,10 +20,10 @@ class BookingCheckoutPage extends ConsumerStatefulWidget {
 }
 
 class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
-  final _formKey = GlobalKey<FormState>();
-  String name = '';
-  String email = '';
-  String phone = '';
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  
   bool isLoading = false;
   MidtransSDK? midtrans;
 
@@ -30,6 +31,14 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
   void initState() {
     super.initState();
     _initMidtrans();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    super.dispose();
   }
 
   Future<void> _initMidtrans() async {
@@ -48,8 +57,14 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
   }
 
   Future<void> _processCheckout() async {
-    if (!_formKey.currentState!.validate()) return;
-    _formKey.currentState!.save();
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Harap lengkapi semua data')));
+      return;
+    }
 
     setState(() => isLoading = true);
 
@@ -97,47 +112,80 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkout'),
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textDark,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Kursi Terpilih: ${widget.selectedSeats.join(', ')}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 20),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Nama Penumpang', border: OutlineInputBorder()),
-                onSaved: (val) => name = val ?? '',
-                validator: (val) => val!.isEmpty ? 'Wajib diisi' : null,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.borderStrong),
+                boxShadow: AppShadows.soft,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
-                keyboardType: TextInputType.emailAddress,
-                onSaved: (val) => email = val ?? '',
-                validator: (val) => val!.isEmpty ? 'Wajib diisi' : null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Rincian Pesanan', style: AppTextStyles.h4),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Kursi Terpilih', style: AppTextStyles.body),
+                      Text(
+                        widget.selectedSeats.join(', '),
+                        style: AppTextStyles.h4.copyWith(color: AppColors.primary),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Nomor HP', border: OutlineInputBorder()),
-                keyboardType: TextInputType.phone,
-                onSaved: (val) => phone = val ?? '',
-                validator: (val) => val!.isEmpty ? 'Wajib diisi' : null,
+            ),
+            const SizedBox(height: 24),
+            Text('Data Penumpang', style: AppTextStyles.h3),
+            const SizedBox(height: 16),
+            AuthCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AuthFieldLabel(text: 'Nama Lengkap'),
+                  AuthTextField(
+                    controller: _nameController,
+                    hintText: 'Nama sesuai KTP',
+                    icon: Icons.person_outline_rounded,
+                  ),
+                  const SizedBox(height: 16),
+                  const AuthFieldLabel(text: 'Email'),
+                  AuthTextField(
+                    controller: _emailController,
+                    hintText: 'Alamat Email',
+                    icon: Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 16),
+                  const AuthFieldLabel(text: 'Nomor HP'),
+                  AuthTextField(
+                    controller: _phoneController,
+                    hintText: 'Contoh: 08123456789',
+                    icon: Icons.phone_outlined,
+                    keyboardType: TextInputType.phone,
+                  ),
+                ],
               ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: isLoading ? null : _processCheckout,
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, padding: const EdgeInsets.all(16)),
-                child: isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('Bayar Sekarang'),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 32),
+            AuthPrimaryButton(
+              label: 'Bayar Sekarang',
+              onPressed: _processCheckout,
+              isLoading: isLoading,
+            ),
+          ],
         ),
       ),
     );
   }
 }
+

@@ -47,8 +47,7 @@ class _SeatSelectionPageState extends ConsumerState<SeatSelectionPage> {
 
   void _onEvent(PusherEvent event) {
     if (event.eventName == 'seat.locked') {
-      final data = event.data; // parse JSON if needed
-      // Basic handling (assume data has seatNumber)
+      // final data = event.data; // parse JSON if needed
       // setState(() { _lockedSeats.add(seatNumber.toString()); });
     }
   }
@@ -67,26 +66,35 @@ class _SeatSelectionPageState extends ConsumerState<SeatSelectionPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pilih Kursi'),
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textDark,
       ),
       body: scheduleAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(child: Text('Error: $err', style: AppTextStyles.body)),
         data: (schedule) {
           final capacity = schedule['bus']['capacity'] as int? ?? 40;
-          // Normally we mix API booked seats + WS locked seats
           final apiOccupied = (schedule['occupied_seats'] as List?)?.cast<String>() ?? [];
           
           return Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildLegend('Tersedia', Colors.white, AppColors.borderStrong),
+                    _buildLegend('Terisi', AppColors.borderStrong, AppColors.borderStrong),
+                    _buildLegend('Dipilih', AppColors.primary, AppColors.primary),
+                  ],
+                ),
+              ),
               Expanded(
                 child: GridView.builder(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 1,
                   ),
                   itemCount: capacity,
                   itemBuilder: (context, index) {
@@ -100,18 +108,22 @@ class _SeatSelectionPageState extends ConsumerState<SeatSelectionPage> {
                           isSelected ? _selectedSeats.remove(seatNum) : _selectedSeats.add(seatNum);
                         });
                       },
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
-                          color: isOccupied ? Colors.grey[300] : (isSelected ? AppColors.primary : Colors.white),
-                          border: Border.all(color: isOccupied ? Colors.grey : AppColors.primary),
-                          borderRadius: BorderRadius.circular(8),
+                          color: isOccupied ? AppColors.border : (isSelected ? AppColors.primary : Colors.white),
+                          border: Border.all(
+                            color: isOccupied ? AppColors.borderStrong : (isSelected ? AppColors.primary : AppColors.borderStrong),
+                            width: isSelected ? 2 : 1,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: isSelected ? AppShadows.soft : [],
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           seatNum,
-                          style: TextStyle(
-                            color: isOccupied ? Colors.grey[600] : (isSelected ? Colors.white : AppColors.primary),
-                            fontWeight: FontWeight.bold,
+                          style: AppTextStyles.h4.copyWith(
+                            color: isOccupied ? AppColors.muted : (isSelected ? Colors.white : AppColors.primaryText),
                           ),
                         ),
                       ),
@@ -120,23 +132,37 @@ class _SeatSelectionPageState extends ConsumerState<SeatSelectionPage> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
+                  border: const Border(top: BorderSide(color: AppColors.borderStrong)),
+                  boxShadow: AppShadows.soft,
                 ),
                 child: SafeArea(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${_selectedSeats.length} Kursi Dipilih', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Kursi Terpilih', style: AppTextStyles.caption),
+                          const SizedBox(height: 4),
+                          Text(
+                            _selectedSeats.isEmpty ? '-' : '${_selectedSeats.length} Kursi',
+                            style: AppTextStyles.h3,
+                          ),
+                        ],
+                      ),
                       ElevatedButton(
                         onPressed: _selectedSeats.isEmpty ? null : () {
                           context.push('/checkout/${widget.scheduleId}', extra: {
                             'selectedSeats': _selectedSeats.toList(),
                           });
                         },
-                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(120, 50),
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                        ),
                         child: const Text('Lanjut'),
                       )
                     ],
@@ -149,4 +175,23 @@ class _SeatSelectionPageState extends ConsumerState<SeatSelectionPage> {
       ),
     );
   }
+
+  Widget _buildLegend(String label, Color color, Color borderColor) {
+    return Row(
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            border: Border.all(color: borderColor),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(label, style: AppTextStyles.bodySmall),
+      ],
+    );
+  }
 }
+

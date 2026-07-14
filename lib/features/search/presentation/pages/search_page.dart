@@ -201,7 +201,7 @@ class _DateSearchInput extends StatelessWidget {
                 value == null ? hint : DateFormat('dd MMM yyyy').format(value!),
                 style: authBodyStyle(
                   size: 14,
-                  color: value == null ? AuthPalette.muted : AppColors.textDark,
+                  color: value == null ? AuthPalette.muted : AppColors.primaryText,
                 ),
               ),
             ),
