@@ -78,7 +78,7 @@ class AuthShell extends StatelessWidget {
 
 class AuthLogoBadge extends StatelessWidget {
   final double size;
-  const AuthLogoBadge({this.size = 64});
+  const AuthLogoBadge({super.key, this.size = 64});
 
   @override
   Widget build(BuildContext context) {
@@ -321,6 +321,29 @@ class AuthSecondaryButton extends StatelessWidget {
   }
 }
 
+class AuthTinyLink extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const AuthTinyLink({super.key, required this.label, required this.onTap, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        label,
+        style: authBodyStyle(
+          size: 13,
+          weight: FontWeight.w700,
+          color: color ?? AppColors.primary,
+        ),
+      ),
+    );
+  }
+}
+
 class AuthFooterLine extends StatelessWidget {
   final String prompt;
   final String action;
@@ -340,29 +363,78 @@ class AuthFooterLine extends StatelessWidget {
       children: [
         Text(prompt, style: authBodyStyle()),
         const SizedBox(width: 6),
-        GestureDetector(
-          onTap: onTap,
-          child: Text(
-            action,
-            style: authBodyStyle(weight: FontWeight.w700, color: AppColors.primary),
-          ),
-        ),
+        AuthTinyLink(label: action, onTap: onTap),
       ],
     );
   }
 }
 
-class AuthOtpFields extends StatelessWidget {
+class AuthOtpFields extends StatefulWidget {
   final int length;
   final ValueChanged<String>? onChanged;
 
   const AuthOtpFields({super.key, this.length = 6, this.onChanged});
 
   @override
+  State<AuthOtpFields> createState() => AuthOtpFieldsState();
+}
+
+class AuthOtpFieldsState extends State<AuthOtpFields> {
+  late final List<TextEditingController> _controllers;
+  late final List<FocusNode> _focusNodes;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllers = List.generate(widget.length, (_) => TextEditingController());
+    _focusNodes = List.generate(widget.length, (_) => FocusNode());
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+    for (final focusNode in _focusNodes) {
+      focusNode.dispose();
+    }
+    super.dispose();
+  }
+
+  String get otp => _controllers.map((c) => c.text).join();
+
+  @override
   Widget build(BuildContext context) {
-    return const SizedBox(
-      height: 60,
-      child: Placeholder(), // Simplified for brevity in this redesign pass
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(widget.length, (index) {
+        return SizedBox(
+          width: 48,
+          child: TextField(
+            controller: _controllers[index],
+            focusNode: _focusNodes[index],
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            maxLength: 1,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: authBodyStyle(
+              size: 18,
+              weight: FontWeight.w700,
+              color: AuthPalette.textPrimary,
+            ),
+            decoration: const InputDecoration(counterText: '', hintText: '0'),
+            onChanged: (value) {
+              if (value.isNotEmpty && index < widget.length - 1) {
+                _focusNodes[index + 1].requestFocus();
+              }
+              if (value.isEmpty && index > 0) {
+                _focusNodes[index - 1].requestFocus();
+              }
+              widget.onChanged?.call(otp);
+            },
+          ),
+        );
+      }),
     );
   }
 }

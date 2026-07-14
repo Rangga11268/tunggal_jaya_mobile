@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/config/app_theme.dart';
 import '../../../../core/network/api_client.dart';
-import '../../auth/presentation/pages/auth_shared.dart';
+import '../../../../features/auth/presentation/pages/auth_shared.dart';
 import 'package:midtrans_sdk/midtrans_sdk.dart';
 
 class BookingCheckoutPage extends ConsumerStatefulWidget {
@@ -53,7 +53,7 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
         ),
       ),
     );
-    midtrans?.setUIKitCustomSetting(skipCustomerDetailsPages: true);
+    // midtrans?.setUIKitCustomSetting(skipCustomerDetailsPages: true);
   }
 
   Future<void> _processCheckout() async {
@@ -155,14 +155,14 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
                   AuthTextField(
                     controller: _nameController,
                     hintText: 'Nama sesuai KTP',
-                    icon: Icons.person_outline_rounded,
+                    prefixIcon: Icons.person_outline_rounded,
                   ),
                   const SizedBox(height: 16),
                   const AuthFieldLabel(text: 'Email'),
                   AuthTextField(
                     controller: _emailController,
                     hintText: 'Alamat Email',
-                    icon: Icons.email_outlined,
+                    prefixIcon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
@@ -170,7 +170,7 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
                   AuthTextField(
                     controller: _phoneController,
                     hintText: 'Contoh: 08123456789',
-                    icon: Icons.phone_outlined,
+                    prefixIcon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                   ),
                 ],
@@ -180,7 +180,7 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
             AuthPrimaryButton(
               label: 'Bayar Sekarang',
               onPressed: _processCheckout,
-              isLoading: isLoading,
+              isBusy: isLoading,
             ),
           ],
         ),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import '../../../../core/config/app_theme.dart';
-import '../../search/data/search_repository.dart';
+import '../../../search/data/search_repository.dart';
 
 final scheduleDetailProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, id) async {
   final repo = ref.read(searchRepositoryProvider);
