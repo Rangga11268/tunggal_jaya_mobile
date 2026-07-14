@@ -130,7 +130,7 @@ class _TicketCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Sisa: ${schedule['capacity'] ?? '-'}',
+                    'Sisa: ${schedule['available_seats'] ?? '-'}',
                     style: AppTextStyles.label.copyWith(color: AppColors.primaryDark),
                   ),
                 ),

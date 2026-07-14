@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import '../../../../core/config/app_theme.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../search/data/search_repository.dart';
 
 final scheduleDetailProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, id) async {
@@ -34,8 +36,8 @@ class _SeatSelectionPageState extends ConsumerState<SeatSelectionPage> {
     pusher = PusherChannelsFlutter.getInstance();
     try {
       await pusher.init(
-        apiKey: "app-key", // In production, get from .env
-        cluster: "mt1",
+        apiKey: AppConfig.pusherAppKey,
+        cluster: AppConfig.pusherCluster,
         onEvent: _onEvent,
       );
       await pusher.subscribe(channelName: 'schedule.${widget.scheduleId}');
@@ -46,9 +48,23 @@ class _SeatSelectionPageState extends ConsumerState<SeatSelectionPage> {
   }
 
   void _onEvent(PusherEvent event) {
-    if (event.eventName == 'seat.locked') {
-      // final data = event.data; // parse JSON if needed
-      // setState(() { _lockedSeats.add(seatNumber.toString()); });
+    if (event.eventName == 'seat.locked' || event.eventName == '.seat.locked') {
+      try {
+        final data = jsonDecode(event.data.toString());
+        final seatNumber = data['seatNumber'].toString();
+        final isLocked = data['isLocked'] as bool? ?? true;
+        
+        setState(() {
+          if (isLocked) {
+            _lockedSeats.add(seatNumber);
+            _selectedSeats.remove(seatNumber);
+          } else {
+            _lockedSeats.remove(seatNumber);
+          }
+        });
+      } catch (e) {
+        debugPrint("Error parsing pusher event: $e");
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/config/app_theme.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../features/auth/presentation/pages/auth_shared.dart';
 import 'package:midtrans_sdk/midtrans_sdk.dart';
@@ -44,8 +45,8 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
   Future<void> _initMidtrans() async {
     midtrans = await MidtransSDK.init(
       config: MidtransConfig(
-        clientKey: "YOUR_CLIENT_KEY", // Get from env
-        merchantBaseUrl: "YOUR_MERCHANT_BASE_URL", // Get from env
+        clientKey: AppConfig.midtransClientKey,
+        merchantBaseUrl: "${AppConfig.apiBaseUrl}/payments/webhook",
         colorTheme: ColorTheme(
           colorPrimary: Theme.of(context).primaryColor,
           colorPrimaryDark: Theme.of(context).primaryColorDark,

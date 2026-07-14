@@ -22,6 +22,10 @@ class AppConfig {
   static String get appName =>
       dotenv.env['APP_NAME'] ?? 'Tunggal Jaya Transport';
 
+  static String get pusherAppKey => dotenv.env['PUSHER_APP_KEY'] ?? '';
+  static String get pusherCluster => dotenv.env['PUSHER_APP_CLUSTER'] ?? 'mt1';
+  static String get midtransClientKey => dotenv.env['MIDTRANS_CLIENT_KEY'] ?? '';
+
   static const Duration requestTimeout = Duration(seconds: 30);
   static const Duration paymentPollInterval = Duration(seconds: 3);
   static const int paymentPollMaxAttempts = 20;
