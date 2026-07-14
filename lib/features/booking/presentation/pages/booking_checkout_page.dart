@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/config/app_theme.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/network/api_client.dart';
@@ -54,6 +55,21 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
         ),
       ),
     );
+    
+    midtrans?.setTransactionFinishedCallback((result) {
+      if (!mounted) return;
+      if (result.isTransactionCanceled) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pembayaran dibatalkan.')));
+      } else if (result.status == TransactionResultStatus.capture || result.status == TransactionResultStatus.settlement) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pembayaran berhasil!')));
+        context.go('/bookings'); 
+      } else if (result.status == TransactionResultStatus.pending) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Menunggu pembayaran...')));
+        context.go('/bookings');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Pembayaran gagal: ${result.status}')));
+      }
+    });
     // midtrans?.setUIKitCustomSetting(skipCustomerDetailsPages: true);
   }
 
