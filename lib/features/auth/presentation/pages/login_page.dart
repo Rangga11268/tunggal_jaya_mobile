@@ -17,7 +17,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _loginSuccess = false;
 
   @override
   void dispose() {
@@ -37,13 +36,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
-    if (authState.isAuthenticated && !_loginSuccess) {
-      _loginSuccess = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/home');
-      });
-    }
 
     return AuthShell(
       showBack: true,

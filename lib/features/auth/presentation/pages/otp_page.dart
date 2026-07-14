@@ -14,7 +14,6 @@ class OtpPage extends ConsumerStatefulWidget {
 
 class _OtpPageState extends ConsumerState<OtpPage> {
   final _otpKey = GlobalKey<AuthOtpFieldsState>();
-  bool _verified = false;
 
   @override
   void initState() {
@@ -35,15 +34,6 @@ class _OtpPageState extends ConsumerState<OtpPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
-    if (authState.isAuthenticated &&
-        !authState.needsVerification &&
-        !_verified) {
-      _verified = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/home');
-      });
-    }
 
     final userPhone = authState.user?['phone'] ?? 'nomor Anda';
 

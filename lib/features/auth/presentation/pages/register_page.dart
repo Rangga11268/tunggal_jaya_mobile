@@ -22,7 +22,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _acceptTerms = true;
-  bool _registerSuccess = false;
 
   @override
   void dispose() {
@@ -48,13 +47,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
-    if (authState.isAuthenticated && !_registerSuccess) {
-      _registerSuccess = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/home');
-      });
-    }
 
     return AuthShell(
       showBack: true,
