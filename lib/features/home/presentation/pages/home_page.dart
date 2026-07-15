@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
 import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../search/data/search_repository.dart';
 import '../../../../core/config/app_theme.dart';
 
 class HomePage extends ConsumerWidget {
@@ -177,69 +181,197 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _SearchCard extends StatelessWidget {
+class _SearchCard extends ConsumerStatefulWidget {
   const _SearchCard();
 
   @override
+  ConsumerState<_SearchCard> createState() => _SearchCardState();
+}
+
+class _SearchCardState extends ConsumerState<_SearchCard> {
+  String? _selectedOrigin;
+  String? _selectedDestination;
+  DateTime? _selectedDate;
+
+  void _selectOrigin(List<String> origins) {
+    _showSelectionSheet('Pilih Kota Asal', origins, (val) {
+      setState(() => _selectedOrigin = val);
+    });
+  }
+
+  void _selectDestination(List<String> destinations) {
+    _showSelectionSheet('Pilih Kota Tujuan', destinations, (val) {
+      setState(() => _selectedDestination = val);
+    });
+  }
+
+  void _showSelectionSheet(String title, List<String> items, ValueChanged<String> onSelected) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(title, style: authTitleStyle(size: 18)),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                      title: Text(items[index], style: authBodyStyle(size: 16, weight: FontWeight.w600)),
+                      onTap: () {
+                        onSelected(items[index]);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _selectDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 30)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.primary, // header background color
+              onPrimary: Colors.white, // header text color
+              onSurface: Colors.black, // body text color
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
+  void _swapLocations() {
+    if (_selectedOrigin != null || _selectedDestination != null) {
+      setState(() {
+        final temp = _selectedOrigin;
+        _selectedOrigin = _selectedDestination;
+        _selectedDestination = temp;
+      });
+    }
+  }
+
+  void _onSearch() {
+    if (_selectedOrigin == null || _selectedDestination == null || _selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Harap lengkapi semua pilihan')));
+      return;
+    }
+    final formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+    context.push('/schedule-list?origin=$_selectedOrigin&destination=$_selectedDestination&date=$formattedDate');
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final originsDestinationsAsync = ref.watch(originsDestinationsProvider);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: AuthCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        child: originsDestinationsAsync.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.all(40.0),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (err, stack) => Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(child: Text('Gagal memuat rute: $err')),
+          ),
+          data: (data) {
+            final origins = (data['data']['origins'] as List).cast<String>();
+            final destinations = (data['data']['destinations'] as List).cast<String>();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.search_rounded,
-                    size: 16, color: AuthPalette.muted),
-                const SizedBox(width: 8),
-                Text(
-                  'CARI JADWAL',
-                  style: authBodyStyle(
-                    size: 11,
-                    weight: FontWeight.w700,
-                    color: AuthPalette.muted,
+                Row(
+                  children: [
+                    Icon(Icons.search_rounded, size: 16, color: AuthPalette.muted),
+                    const SizedBox(width: 8),
+                    Text(
+                      'CARI JADWAL',
+                      style: authBodyStyle(
+                        size: 11,
+                        weight: FontWeight.w700,
+                        color: AuthPalette.muted,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _SearchField(
+                  icon: Icons.trip_origin_rounded,
+                  hint: 'Kota Asal',
+                  value: _selectedOrigin,
+                  onTap: () => _selectOrigin(origins),
+                ),
+                const SizedBox(height: 4),
+                Center(
+                  child: GestureDetector(
+                    onTap: _swapLocations,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.swap_vert_rounded,
+                        color: AppColors.primary,
+                        size: 18,
+                      ),
+                    ),
                   ),
                 ),
+                const SizedBox(height: 4),
+                _SearchField(
+                  icon: Icons.location_on_rounded,
+                  hint: 'Kota Tujuan',
+                  value: _selectedDestination,
+                  onTap: () => _selectDestination(destinations),
+                ),
+                const SizedBox(height: 12),
+                _SearchField(
+                  icon: Icons.calendar_month_rounded,
+                  hint: 'Tanggal Keberangkatan',
+                  value: _selectedDate != null ? DateFormat('dd MMM yyyy').format(_selectedDate!) : null,
+                  onTap: _selectDate,
+                ),
+                const SizedBox(height: 18),
+                AuthPrimaryButton(
+                  label: 'Cari Tiket',
+                  onPressed: _onSearch,
+                ),
               ],
-            ),
-            const SizedBox(height: 16),
-            _SearchField(
-              icon: Icons.trip_origin_rounded,
-              hint: 'Kota Asal',
-            ),
-            const SizedBox(height: 4),
-            Center(
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.swap_vert_rounded,
-                  color: AppColors.primary,
-                  size: 18,
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            _SearchField(
-              icon: Icons.location_on_rounded,
-              hint: 'Kota Tujuan',
-            ),
-            const SizedBox(height: 12),
-            _SearchField(
-              icon: Icons.calendar_month_rounded,
-              hint: 'Tanggal Keberangkatan',
-            ),
-            const SizedBox(height: 18),
-            AuthPrimaryButton(
-              label: 'Cari Tiket',
-              onPressed: () {},
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -249,34 +381,46 @@ class _SearchCard extends StatelessWidget {
 class _SearchField extends StatelessWidget {
   final IconData icon;
   final String hint;
+  final String? value;
+  final VoidCallback onTap;
 
-  const _SearchField({required this.icon, required this.hint});
+  const _SearchField({
+    required this.icon,
+    required this.hint,
+    this.value,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: AuthPalette.background,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AuthPalette.border),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: AuthPalette.muted),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              hint,
-              style: authBodyStyle(
-                size: 14,
-                color: AuthPalette.muted,
+    final hasValue = value != null && value!.isNotEmpty;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: AuthPalette.background,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AuthPalette.border),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: AuthPalette.muted),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                hasValue ? value! : hint,
+                style: authBodyStyle(
+                  size: 14,
+                  weight: hasValue ? FontWeight.w600 : FontWeight.w400,
+                  color: hasValue ? AuthPalette.textPrimary : AuthPalette.muted,
+                ),
               ),
             ),
-          ),
-          Icon(Icons.keyboard_arrow_down_rounded,
-              size: 18, color: AuthPalette.muted),
-        ],
+            Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AuthPalette.muted),
+          ],
+        ),
       ),
     );
   }
