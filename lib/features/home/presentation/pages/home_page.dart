@@ -465,26 +465,34 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _RouteList extends StatelessWidget {
+class _RouteList extends ConsumerWidget {
   const _RouteList();
 
   @override
-  Widget build(BuildContext context) {
-    final routes = [
-      _RouteData('Surabaya', 'Banyuwangi', 'Rp 85.000', '2,5 jam'),
-      _RouteData('Banyuwangi', 'Denpasar', 'Rp 120.000', '4 jam'),
-      _RouteData('Surabaya', 'Denpasar', 'Rp 155.000', '6,5 jam'),
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final routesAsync = ref.watch(routesProvider);
 
     return SizedBox(
       height: 160,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: routes.length,
-        itemBuilder: (context, index) {
-          final route = routes[index];
-          return Container(
+      child: routesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Gagal memuat rute: $err')),
+        data: (data) {
+          final routesList = data['data'] as List<dynamic>;
+          if (routesList.isEmpty) {
+            return const Center(child: Text('Tidak ada rute.'));
+          }
+
+          // Just take up to 5 routes for home page
+          final popularRoutes = routesList.take(5).toList();
+
+          return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: popularRoutes.length,
+            itemBuilder: (context, index) {
+              final route = popularRoutes[index];
+              return Container(
             width: 200,
             margin: const EdgeInsets.only(right: 12),
             padding: const EdgeInsets.all(18),
@@ -510,7 +518,7 @@ class _RouteList extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(route.origin,
+                    Text(route['origin'],
                         style: authBodyStyle(
                             size: 15,
                             weight: FontWeight.w700,
@@ -521,7 +529,7 @@ class _RouteList extends StatelessWidget {
                         const Icon(Icons.arrow_forward_rounded,
                             size: 12, color: AuthPalette.muted),
                         const SizedBox(width: 4),
-                        Text(route.destination,
+                        Text(route['destination'],
                             style: authBodyStyle(
                                 size: 15,
                                 weight: FontWeight.w700,
@@ -532,9 +540,9 @@ class _RouteList extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(route.price,
+                        Text('Cek Jadwal', // Not showing price here since routes don't have base price
                             style: authBodyStyle(
-                                size: 16,
+                                size: 14,
                                 weight: FontWeight.w700,
                                 color: AppColors.primary)),
                         Row(
@@ -542,7 +550,7 @@ class _RouteList extends StatelessWidget {
                             const Icon(Icons.schedule_rounded,
                                 size: 12, color: AuthPalette.muted),
                             const SizedBox(width: 2),
-                            Text(route.duration,
+                            Text(route['duration'],
                                 style: authBodyStyle(
                                     size: 11, color: AuthPalette.muted)),
                           ],
@@ -555,17 +563,11 @@ class _RouteList extends StatelessWidget {
             ),
           );
         },
-      ),
+      );
+    },
+    ),
     );
   }
-}
-
-class _RouteData {
-  final String origin;
-  final String destination;
-  final String price;
-  final String duration;
-  _RouteData(this.origin, this.destination, this.price, this.duration);
 }
 
 class _NewsCard extends StatelessWidget {

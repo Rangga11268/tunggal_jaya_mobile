@@ -6,6 +6,10 @@ class SearchRepository {
 
   SearchRepository(this._apiClient);
 
+  Future<Map<String, dynamic>> getRoutes() async {
+    return await _apiClient.get('/routes');
+  }
+
   Future<Map<String, dynamic>> getOriginsDestinations() async {
     return await _apiClient.get('/routes/origins-destinations');
   }
@@ -32,7 +36,12 @@ final searchRepositoryProvider = Provider<SearchRepository>((ref) {
   return SearchRepository(apiClient);
 });
 
-final originsDestinationsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
-  final repository = ref.read(searchRepositoryProvider);
-  return await repository.getOriginsDestinations();
+final originsDestinationsProvider = FutureProvider((ref) {
+  final repo = ref.watch(searchRepositoryProvider);
+  return repo.getOriginsDestinations();
+});
+
+final routesProvider = FutureProvider((ref) {
+  final repo = ref.watch(searchRepositoryProvider);
+  return repo.getRoutes();
 });

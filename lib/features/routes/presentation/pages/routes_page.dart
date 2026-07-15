@@ -3,37 +3,22 @@ import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../../core/config/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
-class RoutesPage extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../search/data/search_repository.dart';
+
+class RoutesPage extends ConsumerStatefulWidget {
   const RoutesPage({super.key});
 
   @override
+  ConsumerState<RoutesPage> createState() => _RoutesPageState();
+}
+
+class _RoutesPageState extends ConsumerState<RoutesPage> {
+  String _searchQuery = '';
+
+  @override
   Widget build(BuildContext context) {
-    final routes = [
-      _RouteData(
-        'Surabaya', 'Banyuwangi', 'Rp 85.000', '2,5 jam',
-        Icons.route_rounded,
-      ),
-      _RouteData(
-        'Banyuwangi', 'Denpasar', 'Rp 120.000', '4 jam',
-        Icons.route_rounded,
-      ),
-      _RouteData(
-        'Surabaya', 'Denpasar', 'Rp 155.000', '6,5 jam',
-        Icons.route_rounded,
-      ),
-      _RouteData(
-        'Banyuwangi', 'Surabaya', 'Rp 85.000', '2,5 jam',
-        Icons.route_rounded,
-      ),
-      _RouteData(
-        'Denpasar', 'Banyuwangi', 'Rp 120.000', '4 jam',
-        Icons.route_rounded,
-      ),
-      _RouteData(
-        'Denpasar', 'Surabaya', 'Rp 155.000', '6,5 jam',
-        Icons.route_rounded,
-      ),
-    ];
+    final routesAsync = ref.watch(routesProvider);
 
     return SingleChildScrollView(
       child: Column(
@@ -73,6 +58,9 @@ class RoutesPage extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
+                          onChanged: (val) {
+                            setState(() => _searchQuery = val);
+                          },
                           decoration: InputDecoration(
                             hintText: 'Cari rute...',
                             hintStyle: authBodyStyle(
@@ -108,7 +96,28 @@ class RoutesPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...routes.map((route) => _RouteCard(route: route)),
+                routesAsync.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => Center(child: Text('Gagal memuat rute: $err')),
+                  data: (data) {
+                    final routesList = data['data'] as List<dynamic>;
+                    
+                    final filteredRoutes = routesList.where((route) {
+                      final origin = (route['origin'] as String).toLowerCase();
+                      final destination = (route['destination'] as String).toLowerCase();
+                      final query = _searchQuery.toLowerCase();
+                      return origin.contains(query) || destination.contains(query);
+                    }).toList();
+
+                    if (filteredRoutes.isEmpty) {
+                      return const Center(child: Text('Tidak ada rute.'));
+                    }
+
+                    return Column(
+                      children: filteredRoutes.map((route) => _RouteCard(route: route)).toList(),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -119,24 +128,8 @@ class RoutesPage extends StatelessWidget {
   }
 }
 
-class _RouteData {
-  final String origin;
-  final String destination;
-  final String price;
-  final String duration;
-  final IconData icon;
-
-  _RouteData(
-    this.origin,
-    this.destination,
-    this.price,
-    this.duration,
-    this.icon,
-  );
-}
-
 class _RouteCard extends StatelessWidget {
-  final _RouteData route;
+  final dynamic route;
 
   const _RouteCard({required this.route});
 
@@ -170,7 +163,7 @@ class _RouteCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(route.origin,
+                    Text(route['origin'],
                         style: authBodyStyle(
                             size: 15,
                             weight: FontWeight.w700,
@@ -179,7 +172,7 @@ class _RouteCard extends StatelessWidget {
                     const Icon(Icons.arrow_forward_rounded,
                         size: 14, color: AuthPalette.muted),
                     const SizedBox(width: 6),
-                    Text(route.destination,
+                    Text(route['destination'],
                         style: authBodyStyle(
                             size: 15,
                             weight: FontWeight.w700,
@@ -192,15 +185,15 @@ class _RouteCard extends StatelessWidget {
                     const Icon(Icons.schedule_rounded,
                         size: 12, color: AuthPalette.muted),
                     const SizedBox(width: 4),
-                    Text(route.duration,
+                    Text(route['duration'],
                         style: authBodyStyle(
                             size: 12, color: AuthPalette.muted)),
                     const SizedBox(width: 16),
-                    Text('Mulai',
+                    Text('Jarak',
                         style: authBodyStyle(
                             size: 12, color: AuthPalette.muted)),
                     const SizedBox(width: 4),
-                    Text(route.price,
+                    Text('${route['distance']} km',
                         style: authBodyStyle(
                             size: 14,
                             weight: FontWeight.w700,
@@ -211,7 +204,7 @@ class _RouteCard extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => context.go('/search'),
+            onTap: () => context.push('/schedule-list?origin=${route['origin']}&destination=${route['destination']}&date='),
             child: Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 8),
