@@ -58,12 +58,12 @@ class _BookingCheckoutPageState extends ConsumerState<BookingCheckoutPage> {
     
     midtrans?.setTransactionFinishedCallback((result) {
       if (!mounted) return;
-      if (result.isTransactionCanceled) {
+      if (result.status == 'canceled' || result.status == 'cancel') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pembayaran dibatalkan.')));
-      } else if (result.status == TransactionResultStatus.capture || result.status == TransactionResultStatus.settlement) {
+      } else if (result.status == 'capture' || result.status == 'settlement' || result.status == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pembayaran berhasil!')));
         context.go('/bookings'); 
-      } else if (result.status == TransactionResultStatus.pending) {
+      } else if (result.status == 'pending') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Menunggu pembayaran...')));
         context.go('/bookings');
       } else {

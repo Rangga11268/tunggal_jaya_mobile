@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/config/app_theme.dart';
@@ -114,7 +115,7 @@ class ProfilePage extends ConsumerWidget {
                   icon: Icons.confirmation_number_outlined,
                   label: 'Riwayat Pesanan',
                   subtitle: 'Lihat riwayat pemesanan tiket',
-                  onTap: () {},
+                  onTap: () => context.go('/bookings'),
                 ),
                 const SizedBox(height: 8),
                 _MenuCard(
