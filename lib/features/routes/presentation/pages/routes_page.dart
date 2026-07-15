@@ -212,7 +212,17 @@ class _RouteCard extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => context.push('/schedule-list?origin=${route['origin']}&destination=${route['destination']}&date='),
+            onTap: () {
+              final uri = Uri(
+                path: '/schedule-list',
+                queryParameters: {
+                  'origin': route['origin'],
+                  'destination': route['destination'],
+                  'date': '',
+                },
+              ).toString();
+              context.push(uri);
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 8),

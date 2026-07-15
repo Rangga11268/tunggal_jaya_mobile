@@ -492,8 +492,20 @@ class _RouteList extends ConsumerWidget {
             itemCount: popularRoutes.length,
             itemBuilder: (context, index) {
               final route = popularRoutes[index];
-              return Container(
-            width: 200,
+              return GestureDetector(
+                onTap: () {
+                  final uri = Uri(
+                    path: '/schedule-list',
+                    queryParameters: {
+                      'origin': route['origin'],
+                      'destination': route['destination'],
+                      'date': '',
+                    },
+                  ).toString();
+                  context.push(uri);
+                },
+                child: Container(
+                  width: 200,
             margin: const EdgeInsets.only(right: 12),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -566,6 +578,7 @@ class _RouteList extends ConsumerWidget {
                   ],
                 ),
               ],
+            ),
             ),
           );
         },
