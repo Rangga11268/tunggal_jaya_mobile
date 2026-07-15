@@ -163,20 +163,28 @@ class _RouteCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(route['origin'],
-                        style: authBodyStyle(
-                            size: 15,
-                            weight: FontWeight.w700,
-                            color: AuthPalette.textPrimary)),
+                    Flexible(
+                      child: Text(route['origin'],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: authBodyStyle(
+                              size: 15,
+                              weight: FontWeight.w700,
+                              color: AuthPalette.textPrimary)),
+                    ),
                     const SizedBox(width: 6),
                     const Icon(Icons.arrow_forward_rounded,
                         size: 14, color: AuthPalette.muted),
                     const SizedBox(width: 6),
-                    Text(route['destination'],
-                        style: authBodyStyle(
-                            size: 15,
-                            weight: FontWeight.w700,
-                            color: AuthPalette.textPrimary)),
+                    Flexible(
+                      child: Text(route['destination'],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: authBodyStyle(
+                              size: 15,
+                              weight: FontWeight.w700,
+                              color: AuthPalette.textPrimary)),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),

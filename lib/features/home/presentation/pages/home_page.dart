@@ -519,6 +519,8 @@ class _RouteList extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(route['origin'],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: authBodyStyle(
                             size: 15,
                             weight: FontWeight.w700,
@@ -529,11 +531,15 @@ class _RouteList extends ConsumerWidget {
                         const Icon(Icons.arrow_forward_rounded,
                             size: 12, color: AuthPalette.muted),
                         const SizedBox(width: 4),
-                        Text(route['destination'],
-                            style: authBodyStyle(
-                                size: 15,
-                                weight: FontWeight.w700,
-                                color: AuthPalette.textPrimary)),
+                        Flexible(
+                          child: Text(route['destination'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: authBodyStyle(
+                                  size: 15,
+                                  weight: FontWeight.w700,
+                                  color: AuthPalette.textPrimary)),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 6),
