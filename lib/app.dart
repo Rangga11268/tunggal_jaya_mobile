@@ -127,16 +127,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               );
             },
           ),
-          GoRoute(
-            path: '/ticket-detail',
-            parentNavigatorKey: _rootNavigatorKey,
-            builder: (context, state) {
-              final extra = state.extra as Map<String, dynamic>?;
-              return TicketDetailPage(
-                booking: extra ?? {},
-              );
-            },
-          ),
+
         ],
       ),
       GoRoute(
@@ -193,6 +184,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/auth-success',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AuthSuccessPage(),
+      ),
+      GoRoute(
+        path: '/ticket-detail',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return TicketDetailPage(
+            booking: extra ?? {},
+          );
+        },
       ),
     ],
   );
