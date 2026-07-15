@@ -550,7 +550,7 @@ class _RouteList extends ConsumerWidget {
                             const Icon(Icons.schedule_rounded,
                                 size: 12, color: AuthPalette.muted),
                             const SizedBox(width: 2),
-                            Text(route['duration'],
+                            Text('${route['duration']} mnt',
                                 style: authBodyStyle(
                                     size: 11, color: AuthPalette.muted)),
                           ],

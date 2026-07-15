@@ -185,7 +185,7 @@ class _RouteCard extends StatelessWidget {
                     const Icon(Icons.schedule_rounded,
                         size: 12, color: AuthPalette.muted),
                     const SizedBox(width: 4),
-                    Text(route['duration'],
+                    Text('${route['duration']} mnt',
                         style: authBodyStyle(
                             size: 12, color: AuthPalette.muted)),
                     const SizedBox(width: 16),
