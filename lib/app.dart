@@ -24,6 +24,8 @@ import 'features/search/presentation/pages/schedule_list_page.dart';
 import 'features/booking/presentation/pages/seat_selection_page.dart';
 import 'features/booking/presentation/pages/booking_checkout_page.dart';
 import 'features/booking/presentation/pages/ticket_detail_page.dart';
+import 'features/charter/presentation/pages/charter_landing_page.dart';
+import 'features/charter/presentation/pages/charter_request_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -128,6 +130,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             },
           ),
 
+          GoRoute(
+            path: '/charter',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: CharterLandingPage(),
+            ),
+          ),
+          GoRoute(
+            path: '/charter/request',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: CharterRequestPage(),
+            ),
+          ),
         ],
       ),
       GoRoute(

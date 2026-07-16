@@ -24,6 +24,50 @@ class HomePage extends ConsumerWidget {
           _Header(userName: userName),
           const SizedBox(height: 20),
           const _SearchCard(),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: GestureDetector(
+              onTap: () {
+                context.push('/charter');
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, Color(0xFF1E3A8A)],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: AppShadows.card,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.directions_bus_filled_rounded, color: Colors.white, size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Sewa Bus Pariwisata', style: authTitleStyle(size: 16, color: Colors.white)),
+                          const SizedBox(height: 4),
+                          Text('Liburan nyaman dengan armada premium', style: authBodyStyle(size: 12, color: Colors.white.withValues(alpha: 0.8))),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
           const _SectionHeader(
             title: 'Rute Populer',

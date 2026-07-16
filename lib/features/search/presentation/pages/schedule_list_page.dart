@@ -5,12 +5,14 @@ import 'package:intl/intl.dart';
 import '../../data/search_repository.dart';
 import '../../../../core/config/app_theme.dart';
 
-final scheduleListProvider = FutureProvider.family<List<dynamic>, Map<String, String>>((ref, params) async {
+typedef ScheduleParams = ({String origin, String destination, String date});
+
+final scheduleListProvider = FutureProvider.family<List<dynamic>, ScheduleParams>((ref, params) async {
   final repository = ref.read(searchRepositoryProvider);
   final res = await repository.getSchedules(
-    origin: params['origin']!,
-    destination: params['destination']!,
-    date: params['date']!,
+    origin: params.origin,
+    destination: params.destination,
+    date: params.date,
   );
   return res['data'] as List<dynamic>;
 });
@@ -29,11 +31,11 @@ class ScheduleListPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final schedulesAsync = ref.watch(scheduleListProvider({
-      'origin': origin,
-      'destination': destination,
-      'date': date,
-    }));
+    final schedulesAsync = ref.watch(scheduleListProvider((
+      origin: origin,
+      destination: destination,
+      date: date,
+    )));
 
     // Format date string for display
     String displayDate = date;
