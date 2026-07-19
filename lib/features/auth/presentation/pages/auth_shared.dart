@@ -14,7 +14,7 @@ class AuthPalette {
 }
 
 TextStyle authTitleStyle({double size = 28, FontWeight weight = FontWeight.w800, Color? color}) {
-  return GoogleFonts.plusJakartaSans(
+  return GoogleFonts.inter(
     fontSize: size,
     fontWeight: weight,
     color: color ?? AuthPalette.textPrimary,
@@ -24,7 +24,7 @@ TextStyle authTitleStyle({double size = 28, FontWeight weight = FontWeight.w800,
 }
 
 TextStyle authBodyStyle({double size = 15, FontWeight weight = FontWeight.w400, Color? color}) {
-  return GoogleFonts.plusJakartaSans(
+  return GoogleFonts.inter(
     fontSize: size,
     fontWeight: weight,
     color: color ?? AuthPalette.textSecondary,

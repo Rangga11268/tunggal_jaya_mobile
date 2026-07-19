@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../search/data/search_repository.dart';
 import '../../../../core/config/app_theme.dart';
 
 class HomePage extends ConsumerWidget {
@@ -23,200 +20,80 @@ class HomePage extends ConsumerWidget {
         children: [
           _Header(userName: userName),
           const SizedBox(height: 20),
-          const _SearchCard(),
-          const SizedBox(height: 16),
+          const _SearchBar(),
+          const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: GestureDetector(
-              onTap: () {
-                context.push('/charter');
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, Color(0xFF1E3A8A)],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: AppShadows.card,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.directions_bus_filled_rounded, color: Colors.white, size: 28),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Sewa Bus Pariwisata', style: authTitleStyle(size: 16, color: Colors.white)),
-                          const SizedBox(height: 4),
-                          Text('Liburan nyaman dengan armada premium', style: authBodyStyle(size: 12, color: Colors.white.withValues(alpha: 0.8))),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.chevron_right_rounded, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
+            child: Text('Layanan', style: AppTextStyles.label),
           ),
-          const SizedBox(height: 24),
-          const _SectionHeader(
-            title: 'Rute Populer',
-            onSeeAll: null,
-          ),
+          const SizedBox(height: 12),
+          const _QuickLinks(),
+          const SizedBox(height: 28),
+          const _SectionHeader(title: 'Armada Kami'),
           const SizedBox(height: 14),
-          const _RouteList(),
-          const SizedBox(height: 24),
-          const _SectionHeader(
-            title: 'Berita Terbaru',
-            onSeeAll: null,
-          ),
+          const _FleetList(),
+          const SizedBox(height: 28),
+          const _SectionHeader(title: 'Berita Terbaru'),
           const SizedBox(height: 14),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                _NewsCard(
-                  image: 'assets/images/bentas01.webp',
-                  title: 'Info Jadwal Perjalanan Terbaru & Terupdate',
-                  excerpt: 'Dapatkan informasi lengkap mengenai jadwal keberangkatan terbaru armada Tunggal Jaya Transport.',
-                  date: '05 Mar 2026',
-                ),
+                _NewsCard(image: 'assets/images/bentas01.webp', title: 'Info Jadwal Perjalanan Terbaru & Terupdate', date: '05 Mar 2026'),
                 SizedBox(height: 12),
-                _NewsCard(
-                  image: 'assets/images/bentas02.webp',
-                  title: 'Jelajahi Rute & Armada Kelas Premium',
-                  excerpt: 'Nikmati kenyamanan perjalanan dengan armada premium kami.',
-                  date: '05 Mar 2026',
-                ),
+                _NewsCard(image: 'assets/images/bentas02.webp', title: 'Jelajahi Rute & Armada Kelas Premium', date: '05 Mar 2026'),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          const _SectionHeader(
-            title: 'Armada Kami',
-            onSeeAll: null,
-          ),
-          const SizedBox(height: 14),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 0, 20, 32),
-            child: _FleetCard(),
-          ),
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
 }
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   final String userName;
-
   const _Header({required this.userName});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(bottom: BorderSide(color: AuthPalette.border)),
+        border: Border(bottom: BorderSide(color: AppColors.borderStrong)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                width: 44, height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Center(
+                  child: Text(
+                    (userName).substring(0, 1).toUpperCase(),
+                    style: authTitleStyle(size: 18, color: AppColors.primary),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
               Expanded(
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.2),
-                            width: 1.5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          userName.isNotEmpty ? userName.substring(0, 1).toUpperCase() : 'P',
-                          style: authBodyStyle(
-                            size: 18,
-                            weight: FontWeight.w700,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Halo, $userName',
-                            style: authBodyStyle(
-                              size: 15,
-                              weight: FontWeight.w700,
-                              color: AuthPalette.textPrimary,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'Mau kemana hari ini?',
-                            style: authBodyStyle(size: 13),
-                          ),
-                        ],
-                      ),
-                    ),
+                    Text('Halo, $userName', style: authBodyStyle(size: 15, weight: FontWeight.w700)),
+                    Text('Mau kemana hari ini?', style: authBodyStyle(size: 13)),
                   ],
                 ),
               ),
-              Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.notifications_outlined,
-                        color: AuthPalette.textSecondary),
-                    onPressed: () {},
-                  ),
-                  Positioned(
-                    right: 12,
-                    top: 10,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Cari Tiket Bus',
-            style: authTitleStyle(size: 24),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Temukan jadwal perjalanan Anda',
-            style: authBodyStyle(),
           ),
           const SizedBox(height: 20),
         ],
@@ -225,246 +102,77 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _SearchCard extends ConsumerStatefulWidget {
-  const _SearchCard();
-
-  @override
-  ConsumerState<_SearchCard> createState() => _SearchCardState();
-}
-
-class _SearchCardState extends ConsumerState<_SearchCard> {
-  String? _selectedOrigin;
-  String? _selectedDestination;
-  DateTime? _selectedDate;
-
-  void _selectOrigin(List<String> origins) {
-    _showSelectionSheet('Pilih Kota Asal', origins, (val) {
-      setState(() => _selectedOrigin = val);
-    });
-  }
-
-  void _selectDestination(List<String> destinations) {
-    _showSelectionSheet('Pilih Kota Tujuan', destinations, (val) {
-      setState(() => _selectedDestination = val);
-    });
-  }
-
-  void _showSelectionSheet(String title, List<String> items, ValueChanged<String> onSelected) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(title, style: authTitleStyle(size: 18)),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                      title: Text(items[index], style: authBodyStyle(size: 16, weight: FontWeight.w600)),
-                      onTap: () {
-                        onSelected(items[index]);
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _selectDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? now,
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 30)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() => _selectedDate = picked);
-    }
-  }
-
-  void _swapLocations() {
-    if (_selectedOrigin != null || _selectedDestination != null) {
-      setState(() {
-        final temp = _selectedOrigin;
-        _selectedOrigin = _selectedDestination;
-        _selectedDestination = temp;
-      });
-    }
-  }
-
-  void _onSearch() {
-    if (_selectedOrigin == null || _selectedDestination == null || _selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Harap lengkapi semua pilihan')));
-      return;
-    }
-    final formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
-    context.push('/schedule-list?origin=$_selectedOrigin&destination=$_selectedDestination&date=$formattedDate');
-  }
-
+class _SearchBar extends StatelessWidget {
+  const _SearchBar();
   @override
   Widget build(BuildContext context) {
-    final originsDestinationsAsync = ref.watch(originsDestinationsProvider);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: AuthCard(
-        child: originsDestinationsAsync.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.all(40.0),
-            child: Center(child: CircularProgressIndicator()),
+      child: GestureDetector(
+        onTap: () => context.push('/search'),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: AppColors.borderStrong),
+            boxShadow: AppShadows.soft,
           ),
-          error: (err, stack) => Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Center(child: Text('Gagal memuat rute: $err')),
+          child: Row(
+            children: [
+              const Icon(Icons.search_rounded, size: 20, color: AppColors.muted),
+              const SizedBox(width: 12),
+              Text('Cari tujuan...', style: authBodyStyle(size: 15, color: AppColors.muted)),
+            ],
           ),
-          data: (data) {
-            final origins = (data['data']['origins'] as List).cast<String>();
-            final destinations = (data['data']['destinations'] as List).cast<String>();
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.search_rounded, size: 16, color: AuthPalette.muted),
-                    const SizedBox(width: 8),
-                    Text(
-                      'CARI JADWAL',
-                      style: authBodyStyle(
-                        size: 11,
-                        weight: FontWeight.w700,
-                        color: AuthPalette.muted,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _SearchField(
-                  icon: Icons.trip_origin_rounded,
-                  hint: 'Kota Asal',
-                  value: _selectedOrigin,
-                  onTap: () => _selectOrigin(origins),
-                ),
-                const SizedBox(height: 4),
-                Center(
-                  child: GestureDetector(
-                    onTap: _swapLocations,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.swap_vert_rounded,
-                        color: AppColors.primary,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                _SearchField(
-                  icon: Icons.location_on_rounded,
-                  hint: 'Kota Tujuan',
-                  value: _selectedDestination,
-                  onTap: () => _selectDestination(destinations),
-                ),
-                const SizedBox(height: 12),
-                _SearchField(
-                  icon: Icons.calendar_month_rounded,
-                  hint: 'Tanggal Keberangkatan',
-                  value: _selectedDate != null ? DateFormat('dd MMM yyyy').format(_selectedDate!) : null,
-                  onTap: _selectDate,
-                ),
-                const SizedBox(height: 18),
-                AuthPrimaryButton(
-                  label: 'Cari Tiket',
-                  onPressed: _onSearch,
-                ),
-              ],
-            );
-          },
         ),
       ),
     );
   }
 }
 
-class _SearchField extends StatelessWidget {
-  final IconData icon;
-  final String hint;
-  final String? value;
-  final VoidCallback onTap;
-
-  const _SearchField({
-    required this.icon,
-    required this.hint,
-    this.value,
-    required this.onTap,
-  });
-
+class _QuickLinks extends StatelessWidget {
+  const _QuickLinks();
   @override
   Widget build(BuildContext context) {
-    final hasValue = value != null && value!.isNotEmpty;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: AuthPalette.background,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AuthPalette.border),
+    const links = [
+      ('Cari Tiket', Icons.directions_bus_rounded, '/search'),
+      ('Sewa Wisata', Icons.beach_access_rounded, '/charter'),
+      ('Pesanan', Icons.confirmation_number_rounded, '/bookings'),
+      ('Armada', Icons.directions_bus_filled_rounded, '/fleet'),
+      ('Rute', Icons.alt_route_rounded, '/routes'),
+      ('Hubungi', Icons.headset_mic_rounded, '/contact'),
+    ];
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.0,
         ),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: AuthPalette.muted),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                hasValue ? value! : hint,
-                style: authBodyStyle(
-                  size: 14,
-                  weight: hasValue ? FontWeight.w600 : FontWeight.w400,
-                  color: hasValue ? AuthPalette.textPrimary : AuthPalette.muted,
-                ),
+        itemCount: links.length,
+        itemBuilder: (_, i) {
+          final (label, icon, route) = links[i];
+          return GestureDetector(
+            onTap: () => context.push(route),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: AppColors.borderStrong),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 28, color: AppColors.primary),
+                  const SizedBox(height: 8),
+                  Text(label, style: authBodyStyle(size: 12, weight: FontWeight.w600)),
+                ],
               ),
             ),
-            Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AuthPalette.muted),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -472,10 +180,8 @@ class _SearchField extends StatelessWidget {
 
 class _SectionHeader extends StatelessWidget {
   final String title;
-  final VoidCallback? onSeeAll;
-
-  const _SectionHeader({required this.title, this.onSeeAll});
-
+  final VoidCallback? onTap;
+  const _SectionHeader({required this.title, this.onTap});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -484,22 +190,14 @@ class _SectionHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: authTitleStyle(size: 18)),
-          if (onSeeAll != null)
+          if (onTap != null)
             GestureDetector(
-              onTap: onSeeAll,
+              onTap: onTap,
               child: Row(
                 children: [
-                  Text(
-                    'Lihat Semua',
-                    style: authBodyStyle(
-                      size: 13,
-                      weight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  Text('Lihat Semua', style: authBodyStyle(size: 13, weight: FontWeight.w600, color: AppColors.primary)),
                   const SizedBox(width: 2),
-                  const Icon(Icons.chevron_right,
-                      size: 16, color: AppColors.primary),
+                  const Icon(Icons.chevron_right, size: 16, color: AppColors.primary),
                 ],
               ),
             ),
@@ -509,53 +207,24 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _RouteList extends ConsumerWidget {
-  const _RouteList();
-
+class _FleetList extends StatelessWidget {
+  const _FleetList();
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final routesAsync = ref.watch(routesProvider);
-
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 160,
-      child: routesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Gagal memuat rute: $err')),
-        data: (data) {
-          final routesList = data['data'] as List<dynamic>;
-          if (routesList.isEmpty) {
-            return const Center(child: Text('Tidak ada rute.'));
-          }
-
-          // Just take up to 5 routes for home page
-          final popularRoutes = routesList.take(5).toList();
-
-          return ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: popularRoutes.length,
-            itemBuilder: (context, index) {
-              final route = popularRoutes[index];
-              return GestureDetector(
-                onTap: () {
-                  final uri = Uri(
-                    path: '/schedule-list',
-                    queryParameters: {
-                      'origin': route['origin'],
-                      'destination': route['destination'],
-                      'date': '',
-                    },
-                  ).toString();
-                  context.push(uri);
-                },
-                child: Container(
-                  width: 200,
-            margin: const EdgeInsets.only(right: 12),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: 3,
+        itemBuilder: (_, i) {
+          return Container(
+            width: 200, margin: const EdgeInsets.only(right: 12),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AuthPalette.border),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.borderStrong),
               boxShadow: AppShadows.card,
             ),
             child: Column(
@@ -565,113 +234,55 @@ class _RouteList extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
+                    color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.route_rounded,
-                      color: AppColors.primary, size: 18),
+                  child: const Icon(Icons.route_rounded, color: AppColors.primary, size: 18),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(route['origin'],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: authBodyStyle(
-                            size: 15,
-                            weight: FontWeight.w700,
-                            color: AuthPalette.textPrimary)),
+                    Text('Surabaya', style: authBodyStyle(size: 15, weight: FontWeight.w700)),
                     const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        const Icon(Icons.arrow_forward_rounded,
-                            size: 12, color: AuthPalette.muted),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(route['destination'],
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: authBodyStyle(
-                                  size: 15,
-                                  weight: FontWeight.w700,
-                                  color: AuthPalette.textPrimary)),
-                        ),
-                      ],
-                    ),
+                    Row(children: [
+                      const Icon(Icons.arrow_forward_rounded, size: 12, color: AppColors.muted),
+                      const SizedBox(width: 4),
+                      Text('Banyuwangi', style: authBodyStyle(size: 15, weight: FontWeight.w700)),
+                    ]),
                     const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Cek Jadwal', // Not showing price here since routes don't have base price
-                            style: authBodyStyle(
-                                size: 14,
-                                weight: FontWeight.w700,
-                                color: AppColors.primary)),
-                        Row(
-                          children: [
-                            const Icon(Icons.schedule_rounded,
-                                size: 12, color: AuthPalette.muted),
-                            const SizedBox(width: 2),
-                            Text('${route['duration']} mnt',
-                                style: authBodyStyle(
-                                    size: 11, color: AuthPalette.muted)),
-                          ],
-                        ),
-                      ],
-                    ),
+                    Text('Rp 85.000', style: authBodyStyle(size: 16, weight: FontWeight.w700, color: AppColors.primary)),
                   ],
                 ),
               ],
             ),
-            ),
           );
         },
-      );
-    },
-    ),
+      ),
     );
   }
 }
 
 class _NewsCard extends StatelessWidget {
-  final String image;
-  final String title;
-  final String excerpt;
-  final String date;
-
-  const _NewsCard({
-    required this.image,
-    required this.title,
-    required this.excerpt,
-    required this.date,
-  });
-
+  final String image; final String title; final String date;
+  const _NewsCard({required this.image, required this.title, required this.date});
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AuthPalette.border),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.borderStrong),
       ),
       clipBehavior: Clip.antiAlias,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(20)),
-            child: Image.asset(
-              image,
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(AppRadius.lg)),
+            child: Image.asset(image, width: 100, height: 100, fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Container(
-                width: 100,
-                height: 100,
-                color: AuthPalette.background,
-                child: const Icon(Icons.image_outlined,
-                    color: AuthPalette.muted),
+                width: 100, height: 100, color: AppColors.primaryLight,
+                child: const Icon(Icons.image_outlined, color: AppColors.muted),
               ),
             ),
           ),
@@ -681,119 +292,19 @@ class _NewsCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: authBodyStyle(
-                        size: 13,
-                        weight: FontWeight.w600,
-                        color: AuthPalette.textPrimary),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    excerpt,
-                    style: authBodyStyle(size: 11),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today_rounded,
-                          size: 11, color: AuthPalette.muted),
-                      const SizedBox(width: 4),
-                      Text(
-                        date,
-                        style: authBodyStyle(
-                            size: 11, color: AuthPalette.muted),
-                      ),
-                    ],
-                  ),
+                  Text(title, style: authBodyStyle(size: 13, weight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    const Icon(Icons.calendar_today_rounded, size: 11, color: AppColors.muted),
+                    const SizedBox(width: 4),
+                    Text(date, style: authBodyStyle(size: 11, color: AppColors.muted)),
+                  ]),
                 ],
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _FleetCard extends StatelessWidget {
-  const _FleetCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return AuthCard(
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              'assets/images/primadona.webp',
-              width: 90,
-              height: 100,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                width: 90,
-                height: 100,
-                color: AuthPalette.background,
-                child: const Icon(Icons.directions_bus_rounded,
-                    size: 36, color: AuthPalette.muted),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Armada Premium',
-                    style: authBodyStyle(
-                        size: 16,
-                        weight: FontWeight.w700,
-                        color: AuthPalette.textPrimary)),
-                const SizedBox(height: 2),
-                Text('Executive & Business Class',
-                    style: authBodyStyle(size: 12)),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    _FacilityChip(
-                        icon: Icons.airline_seat_recline_normal_rounded,
-                        label: 'Kursi Ergonomis'),
-                    const SizedBox(width: 10),
-                    _FacilityChip(
-                        icon: Icons.wifi_rounded, label: 'WiFi Gratis'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FacilityChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _FacilityChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 12, color: AppColors.primary),
-        const SizedBox(width: 4),
-        Text(label,
-            style: authBodyStyle(
-                size: 10, color: AuthPalette.textSecondary)),
-      ],
     );
   }
 }

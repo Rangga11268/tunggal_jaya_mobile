@@ -2,36 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Brand Red - Slightly refined, elegant red
-  static const Color primary = Color(0xFFE11D48);
-  static const Color primaryDark = Color(0xFFBE123C);
-  static const Color primaryLight = Color(0xFFFEE2E2);
+  // Sky Blue — modern, clean, mobile-first
+  static const Color primary = Color(0xFF0284C7);
+  static const Color primaryDark = Color(0xFF0369A1);
+  static const Color primaryLight = Color(0xFFE0F2FE);
   
-  static const Color accent = Color(0xFFF59E0B);
-  static const Color accentDark = Color(0xFFD97706);
+  static const Color accent = Color(0xFF059669);
+  static const Color accentDark = Color(0xFF047857);
   
-  // Backgrounds - very clean, almost white
-  static const Color background = Color(0xFFFDFDFD);
+  // Backgrounds
+  static const Color background = Color(0xFFF0F9FF);
   static const Color surface = Color(0xFFFFFFFF);
   
-  // Text - high contrast but not pure black
-  static const Color primaryText = Color(0xFF1E293B); // Slate 800
+  // Text
+  static const Color primaryText = Color(0xFF0F172A); // Slate 900
   static const Color secondaryText = Color(0xFF64748B); // Slate 500
   static const Color muted = Color(0xFF94A3B8); // Slate 400
   
   // Borders
-  static const Color border = Color(0xFFF1F5F9); // Slate 100
-  static const Color borderStrong = Color(0xFFE2E8F0); // Slate 200
+  static const Color border = Color(0xFFE0F0F8);
+  static const Color borderStrong = Color(0xFFCBD5E1);
   
   // States
-  static const Color error = Color(0xFFEF4444);
+  static const Color error = Color(0xFFDC2626);
   static const Color warning = Color(0xFFF59E0B);
-  static const Color success = Color(0xFF22C55E);
+  static const Color success = Color(0xFF059669);
   static const Color info = Color(0xFF3B82F6);
   static const Color disabled = Color(0xFFCBD5E1);
   
-  // Extra
-  static const Color scaffoldBackground = Color(0xFFF8FAFC); // Very light slate
+  static const Color scaffoldBackground = Color(0xFFF0F9FF);
 }
 
 class AppSpacing {
@@ -51,14 +50,14 @@ class AppRadius {
   static const double full = 999;
 }
 
-// Clean and modern typography
+// Inter — designed for screen readability, works great on iOS & Android
 TextStyle _primaryFont({
   double fontSize = 15,
   FontWeight fontWeight = FontWeight.w400,
   Color color = AppColors.primaryText,
   double? letterSpacing,
 }) {
-  return GoogleFonts.plusJakartaSans(
+  return GoogleFonts.inter(
     fontSize: fontSize,
     fontWeight: fontWeight,
     color: color,

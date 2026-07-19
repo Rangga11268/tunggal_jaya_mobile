@@ -17,6 +17,7 @@ import 'features/auth/presentation/pages/auth_success_page.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/home/presentation/pages/home_page.dart';
 import 'features/routes/presentation/pages/routes_page.dart';
+import 'features/fleet/presentation/pages/fleet_page.dart';
 import 'features/booking/presentation/pages/booking_history_page.dart';
 import 'features/news/presentation/pages/news_list_page.dart';
 import 'features/profile/presentation/pages/profile_page.dart';
@@ -81,14 +82,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                 const NoTransitionPage(child: HomePage()),
           ),
           GoRoute(
-            path: '/routes',
+            path: '/fleet',
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: RoutesPage()),
-          ),
-          GoRoute(
-            path: '/bookings',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BookingHistoryPage()),
+                const NoTransitionPage(child: FleetPage()),
           ),
           GoRoute(
             path: '/news',
@@ -225,10 +221,9 @@ class MainShell extends StatelessWidget {
 
   int _currentIndex() {
     if (currentLocation.startsWith('/home')) return 0;
-    if (currentLocation.startsWith('/routes')) return 1;
-    if (currentLocation.startsWith('/bookings')) return 2; // Made booking tab 2
-    if (currentLocation.startsWith('/news')) return 3;
-    if (currentLocation.startsWith('/profile')) return 4;
+    if (currentLocation.startsWith('/fleet')) return 1;
+    if (currentLocation.startsWith('/news')) return 2;
+    if (currentLocation.startsWith('/profile')) return 3;
     return 0;
   }
 
@@ -242,19 +237,12 @@ class MainShell extends StatelessWidget {
           switch (index) {
             case 0:
               context.go('/home');
-              break;
             case 1:
-              context.go('/routes');
-              break;
+              context.go('/fleet');
             case 2:
-              context.go('/bookings');
-              break;
-            case 3:
               context.go('/news');
-              break;
-            case 4:
+            case 3:
               context.go('/profile');
-              break;
           }
         },
         backgroundColor: AppColors.surface,
@@ -267,14 +255,9 @@ class MainShell extends StatelessWidget {
             label: 'Beranda',
           ),
           NavigationDestination(
-            icon: Icon(Icons.alt_route_outlined),
-            selectedIcon: Icon(Icons.alt_route_rounded, color: AppColors.primary),
-            label: 'Rute',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.confirmation_number_outlined),
-            selectedIcon: Icon(Icons.confirmation_number_rounded, color: AppColors.primary),
-            label: 'Tiket',
+            icon: Icon(Icons.directions_bus_outlined),
+            selectedIcon: Icon(Icons.directions_bus_rounded, color: AppColors.primary),
+            label: 'Armada',
           ),
           NavigationDestination(
             icon: Icon(Icons.newspaper_outlined),
