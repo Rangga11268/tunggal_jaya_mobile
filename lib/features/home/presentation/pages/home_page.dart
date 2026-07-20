@@ -201,27 +201,37 @@ class _BannerAndSearch extends StatelessWidget {
   }
 }
 
-class _SearchCard extends StatefulWidget {
+class _SearchCard extends ConsumerStatefulWidget {
   const _SearchCard();
 
   @override
-  State<_SearchCard> createState() => _SearchCardState();
+  ConsumerState<_SearchCard> createState() => _SearchCardState();
 }
 
-class _SearchCardState extends State<_SearchCard> {
+class _SearchCardState extends ConsumerState<_SearchCard> {
   int _activeTab = 0; // 0 for Tiket Bus, 1 for Sewa Pariwisata
   String _origin = 'Jakarta';
   String _destination = 'Kuningan';
   DateTime _date = DateTime.now();
   int _passengers = 1;
 
+  // Charter variables
+  String _charterOrigin = 'Jakarta';
+  String _charterDestination = 'Kuningan';
+  DateTime _charterDate = DateTime.now().add(const Duration(days: 1));
+  TimeOfDay _charterTime = const TimeOfDay(hour: 8, minute: 0);
+
   Future<void> _selectCity(bool isOrigin) async {
-    final cities = ['Jakarta', 'Kuningan', 'Bandung', 'Cirebon', 'Tangerang', 'Bekasi', 'Pulogebang', 'Kalideres'];
+    final state = ref.read(originsDestinationsProvider);
+    final cities = state.value != null ? (isOrigin ? state.value!['origins']! : state.value!['destinations']!) : <String>[];
+    final fallback = ['Jakarta', 'Kuningan', 'Bandung', 'Cirebon', 'Tangerang', 'Bekasi'];
+    final list = cities.isNotEmpty ? cities : fallback;
+
     final result = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
         title: Text(isOrigin ? 'Pilih Kota Asal' : 'Pilih Kota Tujuan', style: AppTextStyles.h4),
-        children: cities.map((city) => SimpleDialogOption(
+        children: list.map((city) => SimpleDialogOption(
           onPressed: () => Navigator.pop(context, city),
           child: Text(city, style: AppTextStyles.body),
         )).toList(),
@@ -235,6 +245,31 @@ class _SearchCardState extends State<_SearchCard> {
     }
   }
 
+  Future<void> _selectCharterCity(bool isOrigin) async {
+    final ctrl = TextEditingController(text: isOrigin ? _charterOrigin : _charterDestination);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isOrigin ? 'Pilih Keberangkatan' : 'Pilih Tujuan', style: AppTextStyles.h4),
+        content: TextField(
+          controller: ctrl,
+          decoration: const InputDecoration(hintText: 'Masukkan nama kota'),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, ctrl.text), child: const Text('Simpan')),
+        ],
+      ),
+    );
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        if (isOrigin) _charterOrigin = result;
+        else _charterDestination = result;
+      });
+    }
+  }
+
   Future<void> _selectDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -242,9 +277,25 @@ class _SearchCardState extends State<_SearchCard> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 90)),
     );
-    if (picked != null) {
-      setState(() => _date = picked);
-    }
+    if (picked != null) setState(() => _date = picked);
+  }
+
+  Future<void> _selectCharterDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _charterDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) setState(() => _charterDate = picked);
+  }
+
+  Future<void> _selectCharterTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _charterTime,
+    );
+    if (picked != null) setState(() => _charterTime = picked);
   }
 
   Future<void> _selectPassengers() async {
@@ -258,13 +309,14 @@ class _SearchCardState extends State<_SearchCard> {
         )).toList(),
       ),
     );
-    if (result != null) {
-      setState(() => _passengers = result);
-    }
+    if (result != null) setState(() => _passengers = result);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Watch provider so it fetches data in background
+    ref.watch(originsDestinationsProvider);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -406,7 +458,7 @@ class _SearchCardState extends State<_SearchCard> {
                 children: [
                   Text('KOTA KEBERANGKATAN', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                   const SizedBox(height: 6),
-                  const _SearchInput(icon: LucideIcons.mapPin, text: 'Jakarta'),
+                  _SearchInput(icon: LucideIcons.mapPin, text: _charterOrigin, onTap: () => _selectCharterCity(true)),
                 ],
               ),
             ),
@@ -417,7 +469,7 @@ class _SearchCardState extends State<_SearchCard> {
                 children: [
                   Text('KOTA TUJUAN', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                   const SizedBox(height: 6),
-                  const _SearchInput(icon: LucideIcons.navigation, text: 'Kuningan'),
+                  _SearchInput(icon: LucideIcons.navigation, text: _charterDestination, onTap: () => _selectCharterCity(false)),
                 ],
               ),
             ),
@@ -432,7 +484,7 @@ class _SearchCardState extends State<_SearchCard> {
                 children: [
                   Text('TANGGAL MULAI', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                   const SizedBox(height: 6),
-                  _SearchInput(icon: LucideIcons.calendar, text: DateFormat('dd MMM yyyy', 'id_ID').format(DateTime.now().add(const Duration(days: 1)))),
+                  _SearchInput(icon: LucideIcons.calendar, text: DateFormat('dd MMM yyyy', 'id_ID').format(_charterDate), onTap: _selectCharterDate),
                 ],
               ),
             ),
@@ -443,7 +495,7 @@ class _SearchCardState extends State<_SearchCard> {
                 children: [
                   Text('JAM MULAI', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                   const SizedBox(height: 6),
-                  const _SearchInput(icon: LucideIcons.clock, text: '08:00'),
+                  _SearchInput(icon: LucideIcons.clock, text: _charterTime.format(context), onTap: _selectCharterTime),
                 ],
               ),
             ),
@@ -453,7 +505,18 @@ class _SearchCardState extends State<_SearchCard> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => context.push('/charter'),
+            onPressed: () {
+              // Combine date and time
+              final combinedDate = DateTime(
+                _charterDate.year, _charterDate.month, _charterDate.day,
+                _charterTime.hour, _charterTime.minute,
+              );
+              context.push('/charter/request', extra: {
+                'origin': _charterOrigin,
+                'destination': _charterDestination,
+                'date': combinedDate,
+              });
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF25D366),
               padding: const EdgeInsets.symmetric(vertical: 16),

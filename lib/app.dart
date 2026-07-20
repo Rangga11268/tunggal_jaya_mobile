@@ -137,9 +137,16 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/charter/request',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: CharterRequestPage(),
-            ),
+            pageBuilder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>? ?? {};
+              return NoTransitionPage(
+                child: CharterRequestPage(
+                  initialOrigin: extra['origin'] as String?,
+                  initialDestination: extra['destination'] as String?,
+                  initialPickupDate: extra['date'] as DateTime?,
+                ),
+              );
+            },
           ),
         ],
       ),

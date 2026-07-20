@@ -8,7 +8,16 @@ import '../../../auth/presentation/pages/auth_shared.dart';
 import '../providers/charter_provider.dart';
 
 class CharterRequestPage extends ConsumerStatefulWidget {
-  const CharterRequestPage({super.key});
+  final String? initialOrigin;
+  final String? initialDestination;
+  final DateTime? initialPickupDate;
+
+  const CharterRequestPage({
+    super.key,
+    this.initialOrigin,
+    this.initialDestination,
+    this.initialPickupDate,
+  });
 
   @override
   ConsumerState<CharterRequestPage> createState() => _CharterRequestPageState();
@@ -25,6 +34,14 @@ class _CharterRequestPageState extends ConsumerState<CharterRequestPage> {
   
   String _selectedBusType = 'Big Bus';
   final List<String> _busTypes = ['Big Bus', 'Big Bus (Leg Rest)', 'Medium Bus'];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialOrigin != null) _pickupLocationCtrl.text = widget.initialOrigin!;
+    if (widget.initialDestination != null) _destinationCtrl.text = widget.initialDestination!;
+    if (widget.initialPickupDate != null) _pickupDate = widget.initialPickupDate;
+  }
 
   @override
   void dispose() {
