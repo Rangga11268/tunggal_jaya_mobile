@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,18 +24,31 @@ class HomePage extends ConsumerWidget {
       body: TjBackground(
         child: SingleChildScrollView(
           child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16), // A little spacing at the top
-            _BannerAndSearch(userName: userName),
-            const SizedBox(height: 32),
-            const _QuickLinks(),
-            const SizedBox(height: 32),
-            const _ActiveSchedules(),
-            const SizedBox(height: 32),
-          ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _BannerAndSearch(userName: userName),
+              ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
+                  child: Container(
+                    width: double.infinity,
+                    color: const Color(0xFFFCF9F8).withValues(alpha: 0.85),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 32),
+                        const _QuickLinks(),
+                        const SizedBox(height: 32),
+                        const _ActiveSchedules(),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
