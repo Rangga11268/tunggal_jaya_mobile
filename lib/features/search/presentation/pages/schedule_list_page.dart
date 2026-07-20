@@ -40,6 +40,9 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   String _searchQuery = '';
   String _selectedBus = '';
   String _selectedRoute = '';
+  String _selectedClass = '';
+  bool _availableOnly = false;
+  String _sortBy = 'earliest'; // earliest, cheapest, fastest
 
   @override
   Widget build(BuildContext context) {
@@ -100,14 +103,30 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                 data: (schedules) {
                   final allBuses = schedules.map((s) => (s['bus']?['name'] ?? '').toString()).toSet().toList()..removeWhere((e) => e.isEmpty);
                   final allRoutes = schedules.map((s) => (s['route']?['name'] ?? '').toString()).toSet().toList()..removeWhere((e) => e.isEmpty);
+                  final allClasses = schedules.map((s) => (s['bus']?['type'] ?? 'Executive').toString()).toSet().toList()..removeWhere((e) => e.isEmpty);
 
-                  final filteredSchedules = schedules.where((s) {
+                  var filteredSchedules = schedules.where((s) {
                     final busName = (s['bus']?['name'] ?? '').toString();
                     final routeName = (s['route']?['name'] ?? '').toString();
+                    final busClass = (s['bus']?['type'] ?? 'Executive').toString();
                     final depTime = (s['departure_time'] ?? '').toString();
+                    final availableSeats = (s['available_seats'] ?? 0) as int;
+                    
+                    bool hasDeparted = false;
+                    if (depTime != '--:--') {
+                      try {
+                        final dateToCheck = widget.date.isNotEmpty ? widget.date.substring(0, 10) : DateFormat('yyyy-MM-dd').format(DateTime.now());
+                        final depDateTime = DateTime.parse('$dateToCheck $depTime:00');
+                        if (DateTime.now().isAfter(depDateTime)) {
+                          hasDeparted = true;
+                        }
+                      } catch (_) {}
+                    }
 
                     if (_selectedBus.isNotEmpty && busName != _selectedBus) return false;
                     if (_selectedRoute.isNotEmpty && routeName != _selectedRoute) return false;
+                    if (_selectedClass.isNotEmpty && busClass != _selectedClass) return false;
+                    if (_availableOnly && (availableSeats <= 0 || hasDeparted)) return false;
 
                     if (_searchQuery.isNotEmpty) {
                       final search = _searchQuery.toLowerCase();
@@ -116,70 +135,151 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                     return true;
                   }).toList();
 
+                  // Sorting
+                  if (_sortBy == 'earliest') {
+                    filteredSchedules.sort((a, b) => (a['departure_time'] ?? '').compareTo(b['departure_time'] ?? ''));
+                  } else if (_sortBy == 'cheapest') {
+                    filteredSchedules.sort((a, b) => (double.tryParse(a['price'].toString()) ?? 0).compareTo(double.tryParse(b['price'].toString()) ?? 0));
+                  } else if (_sortBy == 'availability') {
+                    filteredSchedules.sort((a, b) => (b['available_seats'] ?? 0).compareTo(a['available_seats'] ?? 0));
+                  }
+
                   return Column(
                     children: [
-                      if (allBuses.isNotEmpty || allRoutes.isNotEmpty)
-                        Container(
-                          height: 48,
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            children: [
-                              if (allBuses.isNotEmpty) ...[
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8, top: 12),
-                                  child: Text('Bus:', style: AppTextStyles.label.copyWith(color: AppColors.muted)),
+                      Container(
+                        height: 48,
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          children: [
+                            // Urutkan Dropdown
+                            Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: AppColors.borderStrong),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                ...allBuses.map((bus) => Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: FilterChip(
-                                    label: Text(bus),
-                                    selected: _selectedBus == bus,
-                                    onSelected: (selected) => setState(() => _selectedBus = selected ? bus : ''),
-                                    selectedColor: AppColors.primaryLight,
-                                    checkmarkColor: AppColors.primaryDark,
-                                    labelStyle: TextStyle(
-                                      color: _selectedBus == bus ? AppColors.primaryDark : AppColors.primaryText,
-                                      fontWeight: _selectedBus == bus ? FontWeight.bold : FontWeight.normal,
-                                    ),
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                      side: BorderSide(color: _selectedBus == bus ? AppColors.primary : AppColors.borderStrong),
-                                    ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: _sortBy,
+                                    icon: const Icon(LucideIcons.chevronDown, size: 16),
+                                    style: AppTextStyles.label.copyWith(color: AppColors.primaryText),
+                                    onChanged: (val) {
+                                      if (val != null) setState(() => _sortBy = val);
+                                    },
+                                    items: const [
+                                      DropdownMenuItem(value: 'earliest', child: Text('Paling Awal')),
+                                      DropdownMenuItem(value: 'cheapest', child: Text('Termurah')),
+                                      DropdownMenuItem(value: 'availability', child: Text('Terbanyak')),
+                                    ],
                                   ),
-                                )),
-                                const SizedBox(width: 8),
-                              ],
-                              if (allRoutes.isNotEmpty) ...[
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8, top: 12),
-                                  child: Text('Rute:', style: AppTextStyles.label.copyWith(color: AppColors.muted)),
                                 ),
-                                ...allRoutes.map((route) => Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: FilterChip(
-                                    label: Text(route),
-                                    selected: _selectedRoute == route,
-                                    onSelected: (selected) => setState(() => _selectedRoute = selected ? route : ''),
-                                    selectedColor: AppColors.primaryLight,
-                                    checkmarkColor: AppColors.primaryDark,
-                                    labelStyle: TextStyle(
-                                      color: _selectedRoute == route ? AppColors.primaryDark : AppColors.primaryText,
-                                      fontWeight: _selectedRoute == route ? FontWeight.bold : FontWeight.normal,
-                                    ),
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                      side: BorderSide(color: _selectedRoute == route ? AppColors.primary : AppColors.borderStrong),
-                                    ),
+                              ),
+                            ),
+                            // Hanya Tersedia
+                            Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: FilterChip(
+                                label: const Text('Tersedia'),
+                                selected: _availableOnly,
+                                onSelected: (val) => setState(() => _availableOnly = val),
+                                selectedColor: AppColors.primaryLight,
+                                checkmarkColor: AppColors.primaryDark,
+                                labelStyle: TextStyle(
+                                  color: _availableOnly ? AppColors.primaryDark : AppColors.primaryText,
+                                  fontWeight: _availableOnly ? FontWeight.bold : FontWeight.normal,
+                                ),
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  side: BorderSide(color: _availableOnly ? AppColors.primary : AppColors.borderStrong),
+                                ),
+                              ),
+                            ),
+                            if (allClasses.isNotEmpty) ...[
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8, top: 12),
+                                child: Text('Kelas:', style: AppTextStyles.label.copyWith(color: AppColors.muted)),
+                              ),
+                              ...allClasses.map((c) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: FilterChip(
+                                  label: Text(c),
+                                  selected: _selectedClass == c,
+                                  onSelected: (selected) => setState(() => _selectedClass = selected ? c : ''),
+                                  selectedColor: AppColors.primaryLight,
+                                  checkmarkColor: AppColors.primaryDark,
+                                  labelStyle: TextStyle(
+                                    color: _selectedClass == c ? AppColors.primaryDark : AppColors.primaryText,
+                                    fontWeight: _selectedClass == c ? FontWeight.bold : FontWeight.normal,
                                   ),
-                                )),
-                              ],
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide(color: _selectedClass == c ? AppColors.primary : AppColors.borderStrong),
+                                  ),
+                                ),
+                              )),
+                              const SizedBox(width: 8),
                             ],
-                          ),
+                            if (allBuses.isNotEmpty) ...[
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8, top: 12),
+                                child: Text('Bus:', style: AppTextStyles.label.copyWith(color: AppColors.muted)),
+                              ),
+                              ...allBuses.map((bus) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: FilterChip(
+                                  label: Text(bus),
+                                  selected: _selectedBus == bus,
+                                  onSelected: (selected) => setState(() => _selectedBus = selected ? bus : ''),
+                                  selectedColor: AppColors.primaryLight,
+                                  checkmarkColor: AppColors.primaryDark,
+                                  labelStyle: TextStyle(
+                                    color: _selectedBus == bus ? AppColors.primaryDark : AppColors.primaryText,
+                                    fontWeight: _selectedBus == bus ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide(color: _selectedBus == bus ? AppColors.primary : AppColors.borderStrong),
+                                  ),
+                                ),
+                              )),
+                              const SizedBox(width: 8),
+                            ],
+                            if (allRoutes.isNotEmpty) ...[
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8, top: 12),
+                                child: Text('Rute:', style: AppTextStyles.label.copyWith(color: AppColors.muted)),
+                              ),
+                              ...allRoutes.map((route) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: FilterChip(
+                                  label: Text(route),
+                                  selected: _selectedRoute == route,
+                                  onSelected: (selected) => setState(() => _selectedRoute = selected ? route : ''),
+                                  selectedColor: AppColors.primaryLight,
+                                  checkmarkColor: AppColors.primaryDark,
+                                  labelStyle: TextStyle(
+                                    color: _selectedRoute == route ? AppColors.primaryDark : AppColors.primaryText,
+                                    fontWeight: _selectedRoute == route ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide(color: _selectedRoute == route ? AppColors.primary : AppColors.borderStrong),
+                                  ),
+                                ),
+                              )),
+                            ],
+                          ],
                         ),
+                      ),
                       Expanded(
                         child: filteredSchedules.isEmpty
                           ? Center(
@@ -241,9 +341,10 @@ class _TicketCard extends StatelessWidget {
 
     // Check if departed
     bool hasDeparted = false;
-    if (scheduleDate.isNotEmpty && departureTime != '--:--') {
+    if (departureTime != '--:--') {
       try {
-        final depDateTime = DateTime.parse('${scheduleDate.substring(0, 10)} $departureTime:00');
+        final dateToCheck = scheduleDate.isNotEmpty ? scheduleDate.substring(0, 10) : DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final depDateTime = DateTime.parse('$dateToCheck $departureTime:00');
         if (DateTime.now().isAfter(depDateTime)) {
           hasDeparted = true;
         }
@@ -316,7 +417,7 @@ class _TicketCard extends StatelessWidget {
                     Text(departureTime, style: AppTextStyles.h3),
                   ],
                 ),
-                Icon(Icons.arrow_right_alt_rounded, color: AppColors.muted),
+                const Icon(LucideIcons.arrowRight, color: AppColors.muted),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -336,12 +437,17 @@ class _TicketCard extends StatelessWidget {
               children: [
                 Text(price, style: AppTextStyles.h3.copyWith(color: AppColors.primary)),
                 ElevatedButton(
-                  onPressed: (hasDeparted || isFull) ? null : () => context.push('/seat-selection/${schedule['id']}'),
+                  onPressed: (hasDeparted || isFull) ? null : () {
+                    context.push('/booking/history/detail/${schedule['id']}');
+                    // In real app, navigate to seat selection:
+                    // context.push('/seat-selection?scheduleId=${schedule['id']}&date=$dateToCheck');
+                  },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(0, 40),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+                    backgroundColor: (hasDeparted || isFull) ? Colors.grey.shade400 : AppColors.primary,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: const Text('Pilih'),
+                  child: Text((hasDeparted || isFull) ? 'Tidak Tersedia' : 'Pilih', style: AppTextStyles.bodyBold.copyWith(color: Colors.white)),
                 ),
               ],
             ),
