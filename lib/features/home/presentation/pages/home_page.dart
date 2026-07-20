@@ -590,6 +590,19 @@ class _ActiveSchedules extends ConsumerWidget {
                   final route = schedule['route'] ?? {};
                   final bus = schedule['bus'] ?? {};
                   
+                  bool hasDeparted = false;
+                  final depTimeStr = schedule['departure_time']?.toString() ?? '';
+                  if (depTimeStr.isNotEmpty) {
+                    try {
+                      final now = DateTime.now();
+                      final dateStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+                      final depDateTime = DateTime.parse('$dateStr ${depTimeStr.substring(0, 5)}:00');
+                      if (now.isAfter(depDateTime)) {
+                        hasDeparted = true;
+                      }
+                    } catch (_) {}
+                  }
+                  
                   return Container(
                     width: 290,
                     margin: const EdgeInsets.only(right: 16),
@@ -678,14 +691,15 @@ class _ActiveSchedules extends ConsumerWidget {
                                 ),
                               ),
                               ElevatedButton(
-                                onPressed: () => context.push('/seat-selection/${schedule['id']}'),
+                                onPressed: hasDeparted ? null : () => context.push('/seat-selection/${schedule['id']}'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF10207A),
+                                  disabledBackgroundColor: Colors.grey.shade300,
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   minimumSize: const Size(0, 36),
                                 ),
-                                child: Text('Pesan', style: AppTextStyles.bodyBold.copyWith(color: Colors.white, fontSize: 12)),
+                                child: Text(hasDeparted ? 'Berangkat' : 'Pesan', style: AppTextStyles.bodyBold.copyWith(color: hasDeparted ? Colors.grey.shade600 : Colors.white, fontSize: 12)),
                               ),
                             ],
                           ),
