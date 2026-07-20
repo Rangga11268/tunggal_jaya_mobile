@@ -398,25 +398,69 @@ class _SearchCardState extends State<_SearchCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('KOTA ASAL', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-        const SizedBox(height: 6),
-        const _SearchInput(icon: LucideIcons.mapPin, text: 'Jakarta'),
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('KOTA KEBERANGKATAN', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                  const SizedBox(height: 6),
+                  const _SearchInput(icon: LucideIcons.mapPin, text: 'Jakarta'),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('KOTA TUJUAN', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                  const SizedBox(height: 6),
+                  const _SearchInput(icon: LucideIcons.navigation, text: 'Kuningan'),
+                ],
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 16),
-        Text('DURASI', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-        const SizedBox(height: 6),
-        const _SearchInput(icon: LucideIcons.clock, text: '1 Hari'),
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('TANGGAL MULAI', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                  const SizedBox(height: 6),
+                  _SearchInput(icon: LucideIcons.calendar, text: DateFormat('dd MMM yyyy', 'id_ID').format(DateTime.now().add(const Duration(days: 1)))),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('JAM MULAI', style: AppTextStyles.label.copyWith(color: const Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                  const SizedBox(height: 6),
+                  const _SearchInput(icon: LucideIcons.clock, text: '08:00'),
+                ],
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () => context.push('/charter'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF10207A),
+              backgroundColor: const Color(0xFF25D366),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 0,
             ),
-            child: Text('Sewa Pariwisata', style: AppTextStyles.bodyBold.copyWith(color: Colors.white, fontSize: 16)),
+            child: Text('Cari Bus Wisata', style: AppTextStyles.bodyBold.copyWith(color: Colors.white, fontSize: 16)),
           ),
         ),
       ],

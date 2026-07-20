@@ -140,7 +140,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                                     selectedColor: AppColors.primaryLight,
                                     checkmarkColor: AppColors.primaryDark,
                                     labelStyle: TextStyle(
-                                      color: _selectedBus == bus ? AppColors.primaryDark : AppColors.text,
+                                      color: _selectedBus == bus ? AppColors.primaryDark : AppColors.primaryText,
                                       fontWeight: _selectedBus == bus ? FontWeight.bold : FontWeight.normal,
                                     ),
                                     backgroundColor: Colors.white,
@@ -166,7 +166,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                                     selectedColor: AppColors.primaryLight,
                                     checkmarkColor: AppColors.primaryDark,
                                     labelStyle: TextStyle(
-                                      color: _selectedRoute == route ? AppColors.primaryDark : AppColors.text,
+                                      color: _selectedRoute == route ? AppColors.primaryDark : AppColors.primaryText,
                                       fontWeight: _selectedRoute == route ? FontWeight.bold : FontWeight.normal,
                                     ),
                                     backgroundColor: Colors.white,
