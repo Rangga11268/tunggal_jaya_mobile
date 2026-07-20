@@ -6,6 +6,9 @@ import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../../core/config/app_theme.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../charter/presentation/providers/charter_provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import '../../../../core/widgets/tj_page_header.dart';
+import '../../../../core/widgets/tj_background.dart';
 
 final bookingsProvider = FutureProvider<List<dynamic>>((ref) async {
   final apiClient = ref.read(apiClientProvider);
@@ -26,14 +29,15 @@ class _BookingHistoryPageState extends ConsumerState<BookingHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _PageHeader(
-          title: 'Pesanan Saya',
-          subtitle: 'Kelola semua pemesanan tiket Anda',
-        ),
-        const SizedBox(height: 16),
+    return TjBackground(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const TjPageHeader(
+            title: 'Pesanan Saya',
+            subtitle: 'Kelola semua pemesanan tiket Anda',
+          ),
+          const SizedBox(height: 16),
         
         // Main Tab (Reguler vs Pariwisata)
         Padding(
@@ -77,8 +81,9 @@ class _BookingHistoryPageState extends ConsumerState<BookingHistoryPage> {
           child: _mainTab == 'Reguler' ? _buildRegulerList() : _buildCharterList(),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildMainTab(String label) {
     final isActive = _mainTab == label;
@@ -422,31 +427,6 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-class _PageHeader extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  const _PageHeader({required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AuthPalette.border)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: authTitleStyle(size: 24)),
-          const SizedBox(height: 4),
-          Text(subtitle, style: authBodyStyle()),
-        ],
-      ),
-    );
-  }
-}
 
 class _EmptyState extends StatelessWidget {
   final bool isCharter;
@@ -454,47 +434,52 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(
-              Icons.confirmation_number_outlined,
-              size: 32,
-              color: AppColors.primary,
-            ),
+    return Stack(
+      children: [
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.confirmation_number_outlined,
+                  size: 32,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('Belum Ada Pesanan', style: authTitleStyle(size: 20)),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  isCharter ? 'Ajukan sewa bus untuk perjalanan rombongan Anda' : 'Pesan tiket bus Anda sekarang dan nikmati perjalanan nyaman',
+                  textAlign: TextAlign.center,
+                  style: authBodyStyle(size: 14, color: AuthPalette.textSecondary),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: 180,
+                height: 48,
+                child: AuthPrimaryButton(
+                  label: isCharter ? 'Sewa Bus' : 'Cari Tiket',
+                  onPressed: () {
+                    context.go(isCharter ? '/charter' : '/home');
+                  },
+                ),
+              ),
+              const SizedBox(height: 140), // Spacing for footer
+            ],
           ),
-          const SizedBox(height: 16),
-          Text('Belum Ada Pesanan', style: authTitleStyle(size: 20)),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
-              isCharter ? 'Ajukan sewa bus untuk perjalanan rombongan Anda' : 'Pesan tiket bus Anda sekarang dan nikmati perjalanan nyaman',
-              style: authBodyStyle(),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: 180,
-            height: 48,
-            child: AuthPrimaryButton(
-              label: isCharter ? 'Sewa Bus' : 'Cari Tiket',
-              onPressed: () {
-                context.go(isCharter ? '/charter' : '/home');
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

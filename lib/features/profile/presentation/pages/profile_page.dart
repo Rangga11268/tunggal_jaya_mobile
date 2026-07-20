@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/pages/auth_shared.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/config/app_theme.dart';
+import '../../../../core/widgets/tj_page_header.dart';
+import '../../../../core/widgets/tj_background.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -13,17 +15,25 @@ class ProfilePage extends ConsumerWidget {
     final authState = ref.watch(authProvider);
     final user = authState.user;
 
-    return SingleChildScrollView(
+    return TjBackground(
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                  bottom: BorderSide(color: AuthPalette.border)),
-            ),
+          const TjPageHeader(
+            title: 'Profil Saya',
+            subtitle: 'Atur informasi akun Anda',
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      border: Border(
+                          bottom: BorderSide(color: AuthPalette.border)),
+                    ),
             child: Column(
               children: [
                 Container(
@@ -122,7 +132,7 @@ class ProfilePage extends ConsumerWidget {
                   icon: Icons.help_outline,
                   label: 'Pusat Bantuan',
                   subtitle: 'FAQ & Hubungi kami',
-                  onTap: () {},
+                  onTap: () => context.go('/help'),
                 ),
                 const SizedBox(height: 8),
                 _MenuCard(
@@ -163,8 +173,12 @@ class ProfilePage extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  ),
+],
+),
+);
+}
 }
 
 class _MenuCard extends StatelessWidget {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/gestures.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'app.dart';
 import 'core/config/app_theme.dart';
 
@@ -19,6 +20,7 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
+  await initializeDateFormatting('id_ID', null);
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

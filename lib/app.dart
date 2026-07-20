@@ -16,10 +16,7 @@ import 'features/auth/presentation/pages/reset_success_page.dart';
 import 'features/auth/presentation/pages/auth_success_page.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/home/presentation/pages/home_page.dart';
-import 'features/routes/presentation/pages/routes_page.dart';
-import 'features/fleet/presentation/pages/fleet_page.dart';
 import 'features/booking/presentation/pages/booking_history_page.dart';
-import 'features/news/presentation/pages/news_list_page.dart';
 import 'features/profile/presentation/pages/profile_page.dart';
 import 'features/search/presentation/pages/schedule_list_page.dart';
 import 'features/booking/presentation/pages/seat_selection_page.dart';
@@ -27,6 +24,8 @@ import 'features/booking/presentation/pages/booking_checkout_page.dart';
 import 'features/booking/presentation/pages/ticket_detail_page.dart';
 import 'features/charter/presentation/pages/charter_landing_page.dart';
 import 'features/charter/presentation/pages/charter_request_page.dart';
+import 'features/help/presentation/pages/help_page.dart';
+import 'features/promo/presentation/pages/promo_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -82,14 +81,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                 const NoTransitionPage(child: HomePage()),
           ),
           GoRoute(
-            path: '/fleet',
+            path: '/booking-history',
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: FleetPage()),
+                const NoTransitionPage(child: BookingHistoryPage()),
           ),
           GoRoute(
-            path: '/news',
+            path: '/help',
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: NewsListPage()),
+                const NoTransitionPage(child: HelpPage()),
+          ),
+          GoRoute(
+            path: '/promo',
+            builder: (context, state) => const PromoPage(),
           ),
           GoRoute(
             path: '/profile',
@@ -221,8 +224,8 @@ class MainShell extends StatelessWidget {
 
   int _currentIndex() {
     if (currentLocation.startsWith('/home')) return 0;
-    if (currentLocation.startsWith('/fleet')) return 1;
-    if (currentLocation.startsWith('/news')) return 2;
+    if (currentLocation.startsWith('/booking-history')) return 1;
+    if (currentLocation.startsWith('/help')) return 2;
     if (currentLocation.startsWith('/profile')) return 3;
     return 0;
   }
@@ -238,9 +241,9 @@ class MainShell extends StatelessWidget {
             case 0:
               context.go('/home');
             case 1:
-              context.go('/fleet');
+              context.go('/booking-history');
             case 2:
-              context.go('/news');
+              context.go('/help');
             case 3:
               context.go('/profile');
           }
@@ -255,14 +258,14 @@ class MainShell extends StatelessWidget {
             label: 'Beranda',
           ),
           NavigationDestination(
-            icon: Icon(Icons.directions_bus_outlined),
-            selectedIcon: Icon(Icons.directions_bus_rounded, color: AppColors.primary),
-            label: 'Armada',
+            icon: Icon(Icons.receipt_long_outlined),
+            selectedIcon: Icon(Icons.receipt_long_rounded, color: AppColors.primary),
+            label: 'Pesanan',
           ),
           NavigationDestination(
-            icon: Icon(Icons.newspaper_outlined),
-            selectedIcon: Icon(Icons.newspaper_rounded, color: AppColors.primary),
-            label: 'Berita',
+            icon: Icon(Icons.help_outline_rounded),
+            selectedIcon: Icon(Icons.help_rounded, color: AppColors.primary),
+            label: 'Bantuan',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline_rounded),
