@@ -110,7 +110,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                     final routeName = (s['route']?['name'] ?? '').toString();
                     final busClass = (s['bus']?['type'] ?? 'Executive').toString();
                     final depTime = (s['departure_time'] ?? '').toString();
-                    final availableSeats = (s['available_seats'] ?? 0) as int;
+                    final availableSeats = int.tryParse(s['available_seats']?.toString() ?? '0') ?? 0;
                     
                     bool hasDeparted = false;
                     if (depTime != '--:--') {
@@ -137,11 +137,15 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
                   // Sorting
                   if (_sortBy == 'earliest') {
-                    filteredSchedules.sort((a, b) => (a['departure_time'] ?? '').compareTo(b['departure_time'] ?? ''));
+                    filteredSchedules.sort((a, b) => (a['departure_time']?.toString() ?? '').compareTo(b['departure_time']?.toString() ?? ''));
                   } else if (_sortBy == 'cheapest') {
-                    filteredSchedules.sort((a, b) => (double.tryParse(a['price'].toString()) ?? 0).compareTo(double.tryParse(b['price'].toString()) ?? 0));
+                    filteredSchedules.sort((a, b) => (double.tryParse(a['price']?.toString() ?? '0') ?? 0).compareTo(double.tryParse(b['price']?.toString() ?? '0') ?? 0));
                   } else if (_sortBy == 'availability') {
-                    filteredSchedules.sort((a, b) => (b['available_seats'] ?? 0).compareTo(a['available_seats'] ?? 0));
+                    filteredSchedules.sort((a, b) {
+                      final seatA = int.tryParse(a['available_seats']?.toString() ?? '0') ?? 0;
+                      final seatB = int.tryParse(b['available_seats']?.toString() ?? '0') ?? 0;
+                      return seatB.compareTo(seatA);
+                    });
                   }
 
                   return Column(
