@@ -38,6 +38,8 @@ class ScheduleListPage extends ConsumerStatefulWidget {
 
 class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   String _searchQuery = '';
+  String _selectedBus = '';
+  String _selectedRoute = '';
 
   @override
   Widget build(BuildContext context) {
@@ -96,45 +98,121 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                   ),
                 ),
                 data: (schedules) {
+                  final allBuses = schedules.map((s) => (s['bus']?['name'] ?? '').toString()).toSet().toList()..removeWhere((e) => e.isEmpty);
+                  final allRoutes = schedules.map((s) => (s['route']?['name'] ?? '').toString()).toSet().toList()..removeWhere((e) => e.isEmpty);
+
                   final filteredSchedules = schedules.where((s) {
-                    if (_searchQuery.isEmpty) return true;
-                    final search = _searchQuery.toLowerCase();
-                    final busName = (s['bus']?['name'] ?? '').toString().toLowerCase();
-                    final routeName = (s['route']?['name'] ?? '').toString().toLowerCase();
-                    final depTime = (s['departure_time'] ?? '').toString().toLowerCase();
-                    return busName.contains(search) || routeName.contains(search) || depTime.contains(search);
+                    final busName = (s['bus']?['name'] ?? '').toString();
+                    final routeName = (s['route']?['name'] ?? '').toString();
+                    final depTime = (s['departure_time'] ?? '').toString();
+
+                    if (_selectedBus.isNotEmpty && busName != _selectedBus) return false;
+                    if (_selectedRoute.isNotEmpty && routeName != _selectedRoute) return false;
+
+                    if (_searchQuery.isNotEmpty) {
+                      final search = _searchQuery.toLowerCase();
+                      return busName.toLowerCase().contains(search) || routeName.toLowerCase().contains(search) || depTime.toLowerCase().contains(search);
+                    }
+                    return true;
                   }).toList();
 
-                  if (filteredSchedules.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(LucideIcons.calendarX2, size: 48, color: AppColors.primary),
+                  return Column(
+                    children: [
+                      if (allBuses.isNotEmpty || allRoutes.isNotEmpty)
+                        Container(
+                          height: 48,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            children: [
+                              if (allBuses.isNotEmpty) ...[
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8, top: 12),
+                                  child: Text('Bus:', style: AppTextStyles.label.copyWith(color: AppColors.muted)),
+                                ),
+                                ...allBuses.map((bus) => Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: FilterChip(
+                                    label: Text(bus),
+                                    selected: _selectedBus == bus,
+                                    onSelected: (selected) => setState(() => _selectedBus = selected ? bus : ''),
+                                    selectedColor: AppColors.primaryLight,
+                                    checkmarkColor: AppColors.primaryDark,
+                                    labelStyle: TextStyle(
+                                      color: _selectedBus == bus ? AppColors.primaryDark : AppColors.text,
+                                      fontWeight: _selectedBus == bus ? FontWeight.bold : FontWeight.normal,
+                                    ),
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(color: _selectedBus == bus ? AppColors.primary : AppColors.borderStrong),
+                                    ),
+                                  ),
+                                )),
+                                const SizedBox(width: 8),
+                              ],
+                              if (allRoutes.isNotEmpty) ...[
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8, top: 12),
+                                  child: Text('Rute:', style: AppTextStyles.label.copyWith(color: AppColors.muted)),
+                                ),
+                                ...allRoutes.map((route) => Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: FilterChip(
+                                    label: Text(route),
+                                    selected: _selectedRoute == route,
+                                    onSelected: (selected) => setState(() => _selectedRoute = selected ? route : ''),
+                                    selectedColor: AppColors.primaryLight,
+                                    checkmarkColor: AppColors.primaryDark,
+                                    labelStyle: TextStyle(
+                                      color: _selectedRoute == route ? AppColors.primaryDark : AppColors.text,
+                                      fontWeight: _selectedRoute == route ? FontWeight.bold : FontWeight.normal,
+                                    ),
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(color: _selectedRoute == route ? AppColors.primary : AppColors.borderStrong),
+                                    ),
+                                  ),
+                                )),
+                              ],
+                            ],
                           ),
-                          const SizedBox(height: 24),
-                          Text('Jadwal Tidak Tersedia', style: AppTextStyles.h3),
-                          const SizedBox(height: 8),
-                          Text('Maaf, tidak ada jadwal bus yang cocok\nSilakan cari dengan kata kunci lain.', textAlign: TextAlign.center, style: AppTextStyles.bodySmall),
-                        ],
+                        ),
+                      Expanded(
+                        child: filteredSchedules.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryLight,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(LucideIcons.calendarX2, size: 48, color: AppColors.primary),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Text('Jadwal Tidak Tersedia', style: AppTextStyles.h3),
+                                  const SizedBox(height: 8),
+                                  Text('Maaf, tidak ada jadwal bus yang cocok\nSilakan cari dengan kata kunci lain.', textAlign: TextAlign.center, style: AppTextStyles.bodySmall),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
+                              padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                              itemCount: filteredSchedules.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 16),
+                              itemBuilder: (context, index) {
+                                final schedule = filteredSchedules[index];
+                                return _TicketCard(schedule: schedule, scheduleDate: widget.date);
+                              },
+                            ),
                       ),
-                    );
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
-                    itemCount: filteredSchedules.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) {
-                      final schedule = filteredSchedules[index];
-                      return _TicketCard(schedule: schedule, scheduleDate: widget.date);
-                    },
+                    ],
                   );
                 },
               ),
@@ -172,6 +250,22 @@ class _TicketCard extends StatelessWidget {
       } catch (_) {}
     }
 
+    bool isFull = (schedule['available_seats'] ?? 0) <= 0;
+
+    Color statusBgColor = AppColors.primaryLight;
+    Color statusTextColor = AppColors.primaryDark;
+    String statusText = 'Sisa: ${schedule['available_seats'] ?? '-'}';
+    
+    if (hasDeparted) {
+      statusBgColor = Colors.red.shade50;
+      statusTextColor = Colors.red.shade700;
+      statusText = 'Berangkat';
+    } else if (isFull) {
+      statusBgColor = Colors.grey.shade200;
+      statusTextColor = Colors.grey.shade700;
+      statusText = 'Penuh';
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -197,12 +291,12 @@ class _TicketCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: hasDeparted ? Colors.red.shade50 : AppColors.primaryLight,
+                    color: statusBgColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    hasDeparted ? 'Berangkat' : 'Sisa: ${schedule['available_seats'] ?? '-'}',
-                    style: AppTextStyles.label.copyWith(color: hasDeparted ? Colors.red.shade700 : AppColors.primaryDark),
+                    statusText,
+                    style: AppTextStyles.label.copyWith(color: statusTextColor),
                   ),
                 ),
               ],
@@ -242,7 +336,7 @@ class _TicketCard extends StatelessWidget {
               children: [
                 Text(price, style: AppTextStyles.h3.copyWith(color: AppColors.primary)),
                 ElevatedButton(
-                  onPressed: hasDeparted ? null : () => context.push('/seat-selection/${schedule['id']}'),
+                  onPressed: (hasDeparted || isFull) ? null : () => context.push('/seat-selection/${schedule['id']}'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(0, 40),
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
