@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Sky Blue — modern, clean, mobile-first
-  static const Color primary = Color(0xFF0284C7);
-  static const Color primaryDark = Color(0xFF0369A1);
-  static const Color primaryLight = Color(0xFFE0F2FE);
+  // Tunggal Jaya Blue
+  static const Color primary = Color(0xFF10207A);
+  static const Color primaryDark = Color(0xFF0C175A);
+  static const Color primaryLight = Color(0xFFEEF0FF);
   
-  static const Color accent = Color(0xFF059669);
-  static const Color accentDark = Color(0xFF047857);
+  static const Color accent = Color(0xFFE63946); // Red accent matching TJ brand
+  static const Color accentDark = Color(0xFFC1121F);
   
   // Backgrounds
-  static const Color background = Color(0xFFF0F9FF);
+  static const Color background = Color(0xFFFCF9F8); // Figma background
   static const Color surface = Color(0xFFFFFFFF);
   
   // Text
@@ -30,7 +30,7 @@ class AppColors {
   static const Color info = Color(0xFF3B82F6);
   static const Color disabled = Color(0xFFCBD5E1);
   
-  static const Color scaffoldBackground = Color(0xFFF0F9FF);
+  static const Color scaffoldBackground = Color(0xFFFCF9F8);
 }
 
 class AppSpacing {

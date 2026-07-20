@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../config/app_theme.dart';
 import '../../../features/auth/presentation/pages/auth_shared.dart';
 
 class TjPageHeader extends StatelessWidget {
   final String title;
   final String subtitle;
+  final bool showBackButton;
 
   const TjPageHeader({
     super.key,
     required this.title,
     required this.subtitle,
+    this.showBackButton = false,
   });
 
   @override
@@ -27,12 +30,32 @@ class TjPageHeader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(title, style: authTitleStyle(size: 24)),
-                  const SizedBox(height: 4),
-                  Text(subtitle, style: authBodyStyle()),
+                  if (showBackButton) ...[
+                    GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.arrow_back_rounded, color: AppColors.primary, size: 20),
+                      ),
+                    ),
+                  ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: authTitleStyle(size: 24)),
+                        const SizedBox(height: 4),
+                        Text(subtitle, style: authBodyStyle()),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

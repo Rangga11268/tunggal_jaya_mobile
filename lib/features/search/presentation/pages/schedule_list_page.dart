@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../data/search_repository.dart';
 import '../../../../core/config/app_theme.dart';
+import '../../../../core/widgets/tj_page_header.dart';
+import '../../../../core/widgets/tj_background.dart';
 
 typedef ScheduleParams = ({String origin, String destination, String date});
 
@@ -45,45 +48,61 @@ class ScheduleListPage extends ConsumerWidget {
     } catch (_) {}
 
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
+      backgroundColor: AppColors.background,
+      body: TjBackground(
+        child: Column(
           children: [
-            Text('$origin - $destination', style: AppTextStyles.h4),
-            Text(displayDate, style: AppTextStyles.bodySmall),
+            TjPageHeader(
+              title: '$origin - $destination',
+              subtitle: displayDate,
+              showBackButton: true,
+            ),
+            Expanded(
+              child: schedulesAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text('Terjadi kesalahan:\n$error', textAlign: TextAlign.center, style: AppTextStyles.body),
+                  ),
+                ),
+                data: (schedules) {
+                  if (schedules.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(LucideIcons.calendarX2, size: 48, color: AppColors.primary),
+                          ),
+                          const SizedBox(height: 24),
+                          Text('Jadwal Tidak Tersedia', style: AppTextStyles.h3),
+                          const SizedBox(height: 8),
+                          Text('Maaf, tidak ada jadwal bus untuk\ntanggal ini. Silakan pilih tanggal lain.', textAlign: TextAlign.center, style: AppTextStyles.bodySmall),
+                        ],
+                      ),
+                    );
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                    itemCount: schedules.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final schedule = schedules[index];
+                      return _TicketCard(schedule: schedule);
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
-      ),
-      body: schedulesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text('Terjadi kesalahan: $error', textAlign: TextAlign.center, style: AppTextStyles.body),
-          ),
-        ),
-        data: (schedules) {
-          if (schedules.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.event_busy_rounded, size: 64, color: AppColors.muted),
-                  const SizedBox(height: 16),
-                  Text('Tidak ada jadwal tersedia\npada tanggal ini.', textAlign: TextAlign.center, style: AppTextStyles.body),
-                ],
-              ),
-            );
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.all(24),
-            itemCount: schedules.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final schedule = schedules[index];
-              return _TicketCard(schedule: schedule);
-            },
-          );
-        },
       ),
     );
   }

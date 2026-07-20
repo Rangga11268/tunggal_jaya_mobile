@@ -43,6 +43,7 @@ class HelpPage extends StatelessWidget {
           const TjPageHeader(
             title: 'Pusat Bantuan',
             subtitle: 'Temukan jawaban atau hubungi kami',
+            showBackButton: true,
           ),
           Expanded(
             child: SingleChildScrollView(
