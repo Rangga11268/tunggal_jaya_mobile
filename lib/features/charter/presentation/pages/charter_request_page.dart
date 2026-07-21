@@ -33,6 +33,7 @@ class _CharterRequestPageState extends ConsumerState<CharterRequestPage> {
   final _notesCtrl = TextEditingController();
   
   String _selectedBusType = 'Big Bus';
+  int _busCount = 1;
   final List<String> _busTypes = ['Big Bus', 'Big Bus (Leg Rest)', 'Medium Bus'];
 
   @override
@@ -102,6 +103,7 @@ class _CharterRequestPageState extends ConsumerState<CharterRequestPage> {
         'pickup_location': _pickupLocationCtrl.text,
         'destination': _destinationCtrl.text,
         'bus_type_requested': _selectedBusType,
+        'bus_count': _busCount,
         'notes': _notesCtrl.text,
       };
 
@@ -188,6 +190,38 @@ class _CharterRequestPageState extends ConsumerState<CharterRequestPage> {
                 onChanged: (val) {
                   if (val != null) setState(() => _selectedBusType = val);
                 },
+              ),
+              const SizedBox(height: 16),
+              
+              // Bus Count Stepper
+              Text('Jumlah Bus', style: authBodyStyle(size: 14, weight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: AuthPalette.border),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('$_busCount Unit', style: authBodyStyle(size: 16, weight: FontWeight.w600)),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: _busCount > 1 ? () => setState(() => _busCount--) : null,
+                          icon: const Icon(Icons.remove_circle_outline, color: AppColors.primary),
+                        ),
+                        Text('$_busCount', style: authBodyStyle(size: 18, weight: FontWeight.w600)),
+                        IconButton(
+                          onPressed: () => setState(() => _busCount++),
+                          icon: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
 
